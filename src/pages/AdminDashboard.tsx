@@ -890,6 +890,9 @@ const AdminDashboard = () => {
             </div>
           )}
 
+          {/* ======================== AI CHATBOT ======================== */}
+          {activeTab === "chatbot" && <AdminChatbotPanel />}
+
         </div>
       </div>
 
