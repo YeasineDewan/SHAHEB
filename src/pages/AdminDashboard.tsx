@@ -5,8 +5,9 @@ import {
   Plus, Search, Eye, Edit, Trash2, DollarSign, TrendingUp, UserCheck, FileText,
   Globe, Image, Megaphone, Receipt, Download, Mail, Bell, ShieldCheck, Palette,
   Type, Link2, Monitor, Smartphone, Save, Upload, X, Check, ChevronRight,
-  Calendar, Clock, MapPin, CreditCard, Printer
+  Calendar, Clock, MapPin, CreditCard, Printer, GripVertical, ExternalLink, Copy
 } from "lucide-react";
+import { ImageDropZone } from "@/components/ui/image-dropzone";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
