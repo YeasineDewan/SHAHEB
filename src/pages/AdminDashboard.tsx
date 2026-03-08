@@ -98,6 +98,9 @@ function InvoicePreview({ invoice, onClose }: { invoice: { id: string; orderId: 
   );
 }
 
+const emptyProduct = { name: "", category: "", price: "", originalPrice: "", stock: "", description: "", slug: "", images: "", sizes: "", colors: "" };
+const emptyCoupon = { code: "", discount_type: "percentage", discount_value: "", min_order_amount: "", max_uses: "", expires_at: "" };
+
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [mobileSidebar, setMobileSidebar] = useState(false);
@@ -109,6 +112,14 @@ const AdminDashboard = () => {
   const [orders, setOrders] = useState<OrderWithItems[]>([]);
   const [coupons, setCoupons] = useState<Tables<"coupons">[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Form state
+  const [showProductForm, setShowProductForm] = useState(false);
+  const [productForm, setProductForm] = useState(emptyProduct);
+  const [savingProduct, setSavingProduct] = useState(false);
+  const [showCouponForm, setShowCouponForm] = useState(false);
+  const [couponForm, setCouponForm] = useState(emptyCoupon);
+  const [savingCoupon, setSavingCoupon] = useState(false);
 
   useEffect(() => {
     const init = async () => {
@@ -166,6 +177,52 @@ const AdminDashboard = () => {
     if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
     setCoupons(prev => prev.filter(c => c.id !== id));
     toast({ title: "Coupon deleted" });
+  };
+
+  const handleCreateProduct = async () => {
+    if (!productForm.name.trim() || !productForm.category.trim() || !productForm.price || !productForm.slug.trim()) {
+      toast({ title: "Missing fields", description: "Name, category, price and slug are required.", variant: "destructive" }); return;
+    }
+    setSavingProduct(true);
+    const { data, error } = await supabase.from("products").insert({
+      name: productForm.name.trim(),
+      category: productForm.category.trim(),
+      price: parseInt(productForm.price),
+      original_price: productForm.originalPrice ? parseInt(productForm.originalPrice) : null,
+      stock: productForm.stock ? parseInt(productForm.stock) : 0,
+      description: productForm.description.trim() || null,
+      slug: productForm.slug.trim().toLowerCase().replace(/\s+/g, "-"),
+      images: productForm.images ? productForm.images.split(",").map(s => s.trim()).filter(Boolean) : [],
+      sizes: productForm.sizes ? productForm.sizes.split(",").map(s => s.trim()).filter(Boolean) : [],
+      colors: productForm.colors ? productForm.colors.split(",").map(s => s.trim()).filter(Boolean) : [],
+    }).select().single();
+    setSavingProduct(false);
+    if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
+    if (data) setProducts(prev => [data, ...prev]);
+    setProductForm(emptyProduct);
+    setShowProductForm(false);
+    toast({ title: "Product created!" });
+  };
+
+  const handleCreateCoupon = async () => {
+    if (!couponForm.code.trim() || !couponForm.discount_value) {
+      toast({ title: "Missing fields", description: "Code and discount value are required.", variant: "destructive" }); return;
+    }
+    setSavingCoupon(true);
+    const { data, error } = await supabase.from("coupons").insert({
+      code: couponForm.code.trim().toUpperCase(),
+      discount_type: couponForm.discount_type,
+      discount_value: parseInt(couponForm.discount_value),
+      min_order_amount: couponForm.min_order_amount ? parseInt(couponForm.min_order_amount) : null,
+      max_uses: couponForm.max_uses ? parseInt(couponForm.max_uses) : null,
+      expires_at: couponForm.expires_at || null,
+    }).select().single();
+    setSavingCoupon(false);
+    if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
+    if (data) setCoupons(prev => [data, ...prev]);
+    setCouponForm(emptyCoupon);
+    setShowCouponForm(false);
+    toast({ title: "Coupon created!" });
   };
 
   const totalRevenue = orders.reduce((sum, o) => sum + o.total, 0);
@@ -327,10 +384,66 @@ const AdminDashboard = () => {
             <div>
               <div className="flex items-center justify-between mb-6">
                 <h2 className="font-bold text-lg">Products ({products.length})</h2>
-                <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full text-xs gap-1" asChild>
-                  <Link to="/products"><Plus className="h-3.5 w-3.5" /> Add Product</Link>
+                <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full text-xs gap-1" onClick={() => setShowProductForm(!showProductForm)}>
+                  <Plus className="h-3.5 w-3.5" /> Add Product
                 </Button>
               </div>
+
+              {/* Add Product Form */}
+              {showProductForm && (
+                <div className="bg-card border border-border rounded-xl p-6 mb-6 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-semibold text-sm">New Product</h3>
+                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setShowProductForm(false)}><X className="h-4 w-4" /></Button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-xs">Name *</Label>
+                      <Input placeholder="Classic Oxford Shirt" value={productForm.name} onChange={e => setProductForm(f => ({ ...f, name: e.target.value }))} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Slug *</Label>
+                      <Input placeholder="classic-oxford-shirt" value={productForm.slug} onChange={e => setProductForm(f => ({ ...f, slug: e.target.value }))} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Category *</Label>
+                      <Input placeholder="shirts" value={productForm.category} onChange={e => setProductForm(f => ({ ...f, category: e.target.value }))} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Price (₹) *</Label>
+                      <Input type="number" placeholder="2499" value={productForm.price} onChange={e => setProductForm(f => ({ ...f, price: e.target.value }))} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Original Price (₹)</Label>
+                      <Input type="number" placeholder="3499" value={productForm.originalPrice} onChange={e => setProductForm(f => ({ ...f, originalPrice: e.target.value }))} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Stock</Label>
+                      <Input type="number" placeholder="50" value={productForm.stock} onChange={e => setProductForm(f => ({ ...f, stock: e.target.value }))} />
+                    </div>
+                    <div className="space-y-2 md:col-span-2">
+                      <Label className="text-xs">Image URLs (comma separated)</Label>
+                      <Input placeholder="https://example.com/img1.jpg, https://example.com/img2.jpg" value={productForm.images} onChange={e => setProductForm(f => ({ ...f, images: e.target.value }))} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Sizes (comma separated)</Label>
+                      <Input placeholder="S, M, L, XL" value={productForm.sizes} onChange={e => setProductForm(f => ({ ...f, sizes: e.target.value }))} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Colors (comma separated)</Label>
+                      <Input placeholder="White, Blue, Black" value={productForm.colors} onChange={e => setProductForm(f => ({ ...f, colors: e.target.value }))} />
+                    </div>
+                    <div className="space-y-2 md:col-span-2">
+                      <Label className="text-xs">Description</Label>
+                      <Textarea placeholder="Product description..." value={productForm.description} onChange={e => setProductForm(f => ({ ...f, description: e.target.value }))} className="h-20" />
+                    </div>
+                  </div>
+                  <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full text-xs gap-1" onClick={handleCreateProduct} disabled={savingProduct}>
+                    <Save className="h-3.5 w-3.5" /> {savingProduct ? "Saving..." : "Save Product"}
+                  </Button>
+                </div>
+              )}
+
               <div className="bg-card border border-border rounded-xl overflow-hidden">
                 <Table>
                   <TableHeader>
@@ -463,7 +576,56 @@ const AdminDashboard = () => {
             <div>
               <div className="flex items-center justify-between mb-6">
                 <h2 className="font-bold text-lg">Coupons ({coupons.length})</h2>
+                <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full text-xs gap-1" onClick={() => setShowCouponForm(!showCouponForm)}>
+                  <Plus className="h-3.5 w-3.5" /> Create Coupon
+                </Button>
               </div>
+
+              {/* Add Coupon Form */}
+              {showCouponForm && (
+                <div className="bg-card border border-border rounded-xl p-6 mb-6 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-semibold text-sm">New Coupon</h3>
+                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setShowCouponForm(false)}><X className="h-4 w-4" /></Button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-xs">Code *</Label>
+                      <Input placeholder="SUMMER20" value={couponForm.code} onChange={e => setCouponForm(f => ({ ...f, code: e.target.value }))} className="font-mono uppercase" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Discount Type</Label>
+                      <Select value={couponForm.discount_type} onValueChange={val => setCouponForm(f => ({ ...f, discount_type: val }))}>
+                        <SelectTrigger className="h-10"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="percentage">Percentage (%)</SelectItem>
+                          <SelectItem value="flat">Flat (₹)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Discount Value *</Label>
+                      <Input type="number" placeholder={couponForm.discount_type === "percentage" ? "20" : "500"} value={couponForm.discount_value} onChange={e => setCouponForm(f => ({ ...f, discount_value: e.target.value }))} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Min Order Amount (₹)</Label>
+                      <Input type="number" placeholder="999" value={couponForm.min_order_amount} onChange={e => setCouponForm(f => ({ ...f, min_order_amount: e.target.value }))} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Max Uses</Label>
+                      <Input type="number" placeholder="500" value={couponForm.max_uses} onChange={e => setCouponForm(f => ({ ...f, max_uses: e.target.value }))} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Expiry Date</Label>
+                      <Input type="datetime-local" value={couponForm.expires_at} onChange={e => setCouponForm(f => ({ ...f, expires_at: e.target.value }))} />
+                    </div>
+                  </div>
+                  <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full text-xs gap-1" onClick={handleCreateCoupon} disabled={savingCoupon}>
+                    <Save className="h-3.5 w-3.5" /> {savingCoupon ? "Saving..." : "Save Coupon"}
+                  </Button>
+                </div>
+              )}
+
               <div className="bg-card border border-border rounded-xl overflow-hidden">
                 <Table>
                   <TableHeader>
