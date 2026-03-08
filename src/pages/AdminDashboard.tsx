@@ -735,52 +735,151 @@ const AdminDashboard = () => {
 
           {/* ======================== BANNERS ======================== */}
           {activeTab === "banners" && (
-            <div>
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="font-bold text-lg">Banner Management</h2>
-                <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full text-xs gap-1"><Plus className="h-3.5 w-3.5" /> Add Banner</Button>
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="font-bold text-lg">Banner Management</h2>
+                  <p className="text-xs text-muted-foreground mt-0.5">Manage hero sliders, promo banners and category images</p>
+                </div>
+                <div className="flex gap-2">
+                  <Badge variant="outline" className="text-[10px]">{mockBanners.length} banners</Badge>
+                </div>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-4 mb-8">
+              {/* Existing Banners Grid */}
+              <div className="grid md:grid-cols-2 gap-4">
                 {mockBanners.map(b => (
-                  <div key={b.id} className="bg-card border border-border rounded-xl overflow-hidden">
-                    <div className="aspect-[2/1] bg-secondary relative">
-                      <img src={b.image} alt={b.title} className="w-full h-full object-cover" />
+                  <div key={b.id} className="bg-card border border-border rounded-xl overflow-hidden group hover:shadow-md transition-shadow">
+                    <div className="aspect-[2/1] bg-secondary relative overflow-hidden">
+                      <img src={b.image} alt={b.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 via-transparent to-transparent" />
                       <Badge className="absolute top-3 right-3" variant={b.status === "Active" ? "default" : "secondary"}>{b.status}</Badge>
+                      <div className="absolute bottom-3 left-3 right-3">
+                        <h3 className="font-semibold text-sm text-background">{b.title}</h3>
+                        <p className="text-[10px] text-background/70 mt-0.5">{b.location}</p>
+                      </div>
                     </div>
-                    <div className="p-4">
-                      <h3 className="font-semibold text-sm mb-1">{b.title}</h3>
-                      <p className="text-xs text-muted-foreground mb-3">Location: {b.location} · Link: {b.link}</p>
+                    <div className="p-4 space-y-3">
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <ExternalLink className="h-3 w-3" />
+                        <span className="truncate">{b.link}</span>
+                        <Button variant="ghost" size="icon" className="h-5 w-5 ml-auto shrink-0"><Copy className="h-2.5 w-2.5" /></Button>
+                      </div>
+                      <Separator />
                       <div className="flex gap-2">
-                        <Button variant="outline" size="sm" className="text-xs rounded-full"><Edit className="h-3 w-3 mr-1" /> Edit</Button>
-                        <Button variant="ghost" size="sm" className="text-xs text-destructive"><Trash2 className="h-3 w-3 mr-1" /> Delete</Button>
+                        <Button variant="outline" size="sm" className="flex-1 text-xs rounded-full gap-1"><Edit className="h-3 w-3" /> Edit</Button>
+                        <Button variant="outline" size="sm" className="text-xs rounded-full gap-1 text-destructive hover:text-destructive"><Trash2 className="h-3 w-3" /> Delete</Button>
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
 
-              <div className="bg-card border border-border rounded-xl p-6">
-                <h3 className="font-semibold text-sm mb-4">Add New Banner</h3>
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="space-y-2"><Label className="text-xs">Banner Title</Label><Input placeholder="Summer Sale 2026" /></div>
-                  <div className="space-y-2">
-                    <Label className="text-xs">Location</Label>
-                    <Select defaultValue="hero">
-                      <SelectTrigger className="h-10"><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="hero">Hero Slider</SelectItem>
-                        <SelectItem value="promo">Promo Banner</SelectItem>
-                        <SelectItem value="category">Category Banner</SelectItem>
-                        <SelectItem value="sidebar">Sidebar</SelectItem>
-                      </SelectContent>
-                    </Select>
+              {/* Add New Banner Form */}
+              <div className="bg-card border border-border rounded-xl overflow-hidden">
+                <div className="bg-secondary/50 px-6 py-4 border-b border-border flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center">
+                    <Plus className="h-4 w-4 text-accent" />
                   </div>
-                  <div className="space-y-2"><Label className="text-xs">Link URL</Label><Input placeholder="/products?sale=true" /></div>
-                  <div className="space-y-2"><Label className="text-xs">Image URL</Label><Input placeholder="https://..." /></div>
+                  <div>
+                    <h3 className="font-semibold text-sm">Add New Banner</h3>
+                    <p className="text-[10px] text-muted-foreground">Upload an image and configure banner placement</p>
+                  </div>
                 </div>
-                <div className="flex items-center gap-3 mt-4">
-                  <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full text-xs gap-1"><Upload className="h-3.5 w-3.5" /> Upload & Save</Button>
+
+                <div className="p-6 space-y-6">
+                  {/* Image Upload */}
+                  <div>
+                    <Label className="text-xs font-medium mb-2 block">Banner Image *</Label>
+                    <ImageDropZone
+                      aspectRatio="aspect-[2.5/1]"
+                      placeholder="Drag & drop your banner image here, or click to browse"
+                      maxSizeMB={5}
+                    />
+                    <p className="text-[10px] text-muted-foreground mt-1.5">Recommended: 1920×768px · PNG or JPG · Max 5MB</p>
+                  </div>
+
+                  {/* Form Fields */}
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-xs">Banner Title *</Label>
+                      <Input placeholder="e.g. Summer Collection 2026" className="h-10" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Subtitle / Description</Label>
+                      <Input placeholder="e.g. Up to 50% off on all shirts" className="h-10" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Placement Location *</Label>
+                      <Select defaultValue="hero">
+                        <SelectTrigger className="h-10"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="hero">Hero Slider (Homepage)</SelectItem>
+                          <SelectItem value="promo">Promo Banner (Mid-page)</SelectItem>
+                          <SelectItem value="category">Category Banner</SelectItem>
+                          <SelectItem value="sidebar">Sidebar Widget</SelectItem>
+                          <SelectItem value="popup">Popup / Modal</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Link URL *</Label>
+                      <Input placeholder="/products?sale=true" className="h-10" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">CTA Button Text</Label>
+                      <Input placeholder="e.g. Shop Now" className="h-10" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Display Order</Label>
+                      <Input type="number" placeholder="1" defaultValue="1" className="h-10" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Start Date</Label>
+                      <Input type="date" className="h-10" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">End Date</Label>
+                      <Input type="date" className="h-10" />
+                    </div>
+                  </div>
+
+                  {/* Toggles */}
+                  <div className="bg-secondary/30 rounded-lg p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="text-sm font-medium">Active</span>
+                        <p className="text-[10px] text-muted-foreground">Banner will be visible on the storefront</p>
+                      </div>
+                      <Switch defaultChecked />
+                    </div>
+                    <Separator />
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="text-sm font-medium">Open in New Tab</span>
+                        <p className="text-[10px] text-muted-foreground">Link opens in a new browser tab</p>
+                      </div>
+                      <Switch />
+                    </div>
+                    <Separator />
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="text-sm font-medium">Mobile Visible</span>
+                        <p className="text-[10px] text-muted-foreground">Show this banner on mobile devices</p>
+                      </div>
+                      <Switch defaultChecked />
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center gap-3 pt-2">
+                    <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full text-xs gap-2 px-6" onClick={() => toast({ title: "Banner saved!", description: "Your banner has been created and is now active." })}>
+                      <Save className="h-3.5 w-3.5" /> Save Banner
+                    </Button>
+                    <Button variant="outline" className="rounded-full text-xs gap-2">
+                      <Eye className="h-3.5 w-3.5" /> Preview
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
