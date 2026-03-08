@@ -13,7 +13,7 @@ export function Layout({ children }: LayoutProps) {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className={isMobile ? "pt-[calc(1.25rem+3.25rem)] pb-20" : "pt-[calc(1.75rem+4rem)]"}>
+      <main className={isMobile ? "pt-[calc(1.75rem+3.25rem+2rem)] pb-20" : "pt-[calc(1.75rem+3.5rem+2.25rem)]"}>
         {children}
       </main>
       <BottomNav />
