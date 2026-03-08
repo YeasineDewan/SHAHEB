@@ -17,7 +17,23 @@ import {
 import { toast } from "@/hooks/use-toast";
 import logoImg from "@/assets/logo.png";
 
-const recentOrders = [
+interface OrderItem {
+  name: string;
+  qty: number;
+  price: number;
+  image: string;
+  isDigital?: boolean;
+}
+
+interface Order {
+  id: string;
+  date: string;
+  status: string;
+  total: number;
+  items: OrderItem[];
+}
+
+const recentOrders: Order[] = [
   { id: "ORD-2026-001", date: "Mar 5, 2026", status: "In Transit", total: 10997, items: [
     { name: "Classic Oxford Shirt", qty: 2, price: 2499, image: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=100&h=120&fit=crop" },
     { name: "Leather Jacket", qty: 1, price: 5999, image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=100&h=120&fit=crop" },
