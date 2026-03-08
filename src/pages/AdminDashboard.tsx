@@ -98,6 +98,9 @@ function InvoicePreview({ invoice, onClose }: { invoice: { id: string; orderId: 
   );
 }
 
+const emptyProduct = { name: "", category: "", price: "", originalPrice: "", stock: "", description: "", slug: "", images: "", sizes: "", colors: "" };
+const emptyCoupon = { code: "", discount_type: "percentage", discount_value: "", min_order_amount: "", max_uses: "", expires_at: "" };
+
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [mobileSidebar, setMobileSidebar] = useState(false);
@@ -109,6 +112,14 @@ const AdminDashboard = () => {
   const [orders, setOrders] = useState<OrderWithItems[]>([]);
   const [coupons, setCoupons] = useState<Tables<"coupons">[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Form state
+  const [showProductForm, setShowProductForm] = useState(false);
+  const [productForm, setProductForm] = useState(emptyProduct);
+  const [savingProduct, setSavingProduct] = useState(false);
+  const [showCouponForm, setShowCouponForm] = useState(false);
+  const [couponForm, setCouponForm] = useState(emptyCoupon);
+  const [savingCoupon, setSavingCoupon] = useState(false);
 
   useEffect(() => {
     const init = async () => {
