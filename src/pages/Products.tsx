@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, SlidersHorizontal, ShoppingBag, Heart, Star, X, Grid3X3, List, ChevronDown, Eye, Filter } from "lucide-react";
@@ -12,31 +12,32 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
-const allProducts = [
-  { id: "1", name: "Classic Oxford Shirt", price: 2499, originalPrice: 3199, image: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=400&h=500&fit=crop", image2: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&h=500&fit=crop", category: "shirts", rating: 4.5, reviews: 128, colors: ["White", "Blue"], isNew: false, isBestseller: true },
-  { id: "2", name: "Slim Fit Chinos", price: 1999, originalPrice: 2699, image: "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=400&h=500&fit=crop", image2: "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=400&h=500&fit=crop", category: "trousers", rating: 4.3, reviews: 89, colors: ["Khaki", "Navy"], isNew: false, isBestseller: false },
-  { id: "3", name: "Leather Jacket", price: 5999, originalPrice: 7999, image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400&h=500&fit=crop", image2: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400&h=500&fit=crop", category: "jackets", rating: 4.8, reviews: 234, colors: ["Black", "Brown"], isNew: false, isBestseller: true },
-  { id: "4", name: "Premium Kurta Set", price: 3499, originalPrice: 4999, image: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=400&h=500&fit=crop", image2: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=400&h=500&fit=crop", category: "ethnic", rating: 4.6, reviews: 167, colors: ["White", "Cream"], isNew: true, isBestseller: false },
-  { id: "5", name: "Style Guide eBook", price: 499, originalPrice: 999, image: "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400&h=500&fit=crop", image2: "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400&h=500&fit=crop", category: "digital", rating: 4.9, reviews: 312, colors: [], isNew: false, isBestseller: true },
-  { id: "6", name: "Formal Blazer", price: 6999, originalPrice: 9999, image: "https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?w=400&h=500&fit=crop", image2: "https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?w=400&h=500&fit=crop", category: "jackets", rating: 4.7, reviews: 198, colors: ["Navy", "Charcoal"], isNew: true, isBestseller: false },
-  { id: "7", name: "Cotton Linen Shirt", price: 1799, originalPrice: 2499, image: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&h=500&fit=crop", image2: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=400&h=500&fit=crop", category: "shirts", rating: 4.4, reviews: 76, colors: ["White", "Sky Blue"], isNew: true, isBestseller: false },
-  { id: "8", name: "Designer Kurta", price: 2999, originalPrice: 4499, image: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=400&h=500&fit=crop", image2: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=400&h=500&fit=crop", category: "ethnic", rating: 4.5, reviews: 143, colors: ["Beige", "Gold"], isNew: false, isBestseller: false },
-  { id: "9", name: "Cargo Joggers", price: 1499, originalPrice: 2199, image: "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=400&h=500&fit=crop", image2: "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=400&h=500&fit=crop", category: "trousers", rating: 4.2, reviews: 56, colors: ["Olive", "Black"], isNew: false, isBestseller: false },
-  { id: "10", name: "Casual Denim Jacket", price: 3999, originalPrice: 5499, image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400&h=500&fit=crop", image2: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400&h=500&fit=crop", category: "jackets", rating: 4.6, reviews: 112, colors: ["Blue", "Black"], isNew: true, isBestseller: false },
-  { id: "11", name: "Polo T-Shirt", price: 999, originalPrice: 1499, image: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=400&h=500&fit=crop", image2: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&h=500&fit=crop", category: "shirts", rating: 4.1, reviews: 45, colors: ["White", "Black", "Navy"], isNew: false, isBestseller: false },
-  { id: "12", name: "Grooming Guide PDF", price: 299, originalPrice: 599, image: "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400&h=500&fit=crop", image2: "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400&h=500&fit=crop", category: "digital", rating: 4.7, reviews: 201, colors: [], isNew: false, isBestseller: false },
-];
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  original_price: number | null;
+  images: string[] | null;
+  category: string;
+  colors: string[] | null;
+  is_active: boolean | null;
+  slug: string;
+  created_at: string;
+  stock: number | null;
+}
 
-const categories = [
-  { value: "all", label: "All Categories", count: 12 },
-  { value: "shirts", label: "Shirts", count: 3 },
-  { value: "trousers", label: "Trousers", count: 2 },
-  { value: "jackets", label: "Jackets & Blazers", count: 3 },
-  { value: "ethnic", label: "Ethnic Wear", count: 2 },
-  { value: "digital", label: "Digital Products", count: 2 },
-];
+const categoryLabels: Record<string, string> = {
+  shirts: "Shirts",
+  trousers: "Trousers",
+  jackets: "Jackets & Blazers",
+  ethnic: "Ethnic Wear",
+  digital: "Digital Products",
+  accessories: "Accessories",
+};
 
 const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -46,26 +47,50 @@ const Products = () => {
   const [sortBy, setSortBy] = useState("popular");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [priceRange, setPriceRange] = useState([0, 10000]);
-  const [quickView, setQuickView] = useState<typeof allProducts[0] | null>(null);
+  const [quickView, setQuickView] = useState<Product | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [onlyNew, setOnlyNew] = useState(false);
   const [onlyBestseller, setOnlyBestseller] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("products")
+        .select("id, name, price, original_price, images, category, colors, is_active, slug, created_at, stock")
+        .eq("is_active", true)
+        .order("created_at", { ascending: false });
+      if (!error && data) setProducts(data);
+      setLoading(false);
+    };
+    fetchProducts();
+  }, []);
+
+  // Derive categories from data
+  const categories = useMemo(() => {
+    const counts: Record<string, number> = {};
+    products.forEach(p => { counts[p.category] = (counts[p.category] || 0) + 1; });
+    const cats = [{ value: "all", label: "All Categories", count: products.length }];
+    Object.entries(counts).sort((a, b) => b[1] - a[1]).forEach(([cat, count]) => {
+      cats.push({ value: cat, label: categoryLabels[cat] || cat, count });
+    });
+    return cats;
+  }, [products]);
 
   const filtered = useMemo(() => {
-    let result = allProducts;
+    let result = products;
     if (activeCategory !== "all") result = result.filter(p => p.category === activeCategory);
     if (search) result = result.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
     result = result.filter(p => p.price >= priceRange[0] && p.price <= priceRange[1]);
-    if (onlyNew) result = result.filter(p => p.isNew);
-    if (onlyBestseller) result = result.filter(p => p.isBestseller);
     if (sortBy === "price-low") result = [...result].sort((a, b) => a.price - b.price);
     if (sortBy === "price-high") result = [...result].sort((a, b) => b.price - a.price);
-    if (sortBy === "rating") result = [...result].sort((a, b) => b.rating - a.rating);
-    if (sortBy === "newest") result = [...result].sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));
+    if (sortBy === "newest") result = [...result].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
     return result;
-  }, [activeCategory, search, sortBy, priceRange, onlyNew, onlyBestseller]);
+  }, [products, activeCategory, search, sortBy, priceRange, onlyNew, onlyBestseller]);
 
-  const activeFiltersCount = [activeCategory !== "all", onlyNew, onlyBestseller, priceRange[0] > 0 || priceRange[1] < 10000].filter(Boolean).length;
+  const activeFiltersCount = [activeCategory !== "all", priceRange[0] > 0 || priceRange[1] < 10000].filter(Boolean).length;
 
   const clearFilters = () => {
     setSearchParams({});
@@ -74,6 +99,9 @@ const Products = () => {
     setOnlyBestseller(false);
     setSearch("");
   };
+
+  const getImage = (p: Product, idx = 0) => p.images?.[idx] || "/placeholder.svg";
+  const getDiscount = (p: Product) => p.original_price ? Math.round((1 - p.price / p.original_price) * 100) : 0;
 
   const FilterSidebar = () => (
     <div className="space-y-6">
@@ -101,30 +129,6 @@ const Products = () => {
           <span>₹{priceRange[1].toLocaleString()}</span>
         </div>
       </div>
-      <Separator />
-      <div>
-        <h3 className="font-semibold text-sm mb-3">Filters</h3>
-        <div className="space-y-3">
-          <label className="flex items-center gap-2.5 cursor-pointer">
-            <Checkbox checked={onlyNew} onCheckedChange={(c) => setOnlyNew(!!c)} />
-            <span className="text-sm">New Arrivals</span>
-          </label>
-          <label className="flex items-center gap-2.5 cursor-pointer">
-            <Checkbox checked={onlyBestseller} onCheckedChange={(c) => setOnlyBestseller(!!c)} />
-            <span className="text-sm">Bestsellers</span>
-          </label>
-        </div>
-      </div>
-      <Separator />
-      <div>
-        <h3 className="font-semibold text-sm mb-3">Rating</h3>
-        {[4, 3, 2].map(r => (
-          <button key={r} className="flex items-center gap-1.5 w-full px-3 py-2 rounded-lg text-sm text-muted-foreground hover:bg-secondary transition-colors">
-            <div className="flex">{Array.from({ length: 5 }).map((_, i) => <Star key={i} className={`h-3 w-3 ${i < r ? "fill-accent text-accent" : "text-muted"}`} />)}</div>
-            <span>& Up</span>
-          </button>
-        ))}
-      </div>
       {activeFiltersCount > 0 && (
         <>
           <Separator />
@@ -136,9 +140,16 @@ const Products = () => {
     </div>
   );
 
+  const ProductSkeleton = () => (
+    <div className="space-y-2.5">
+      <Skeleton className="aspect-[3/4] rounded-xl" />
+      <Skeleton className="h-4 w-3/4" />
+      <Skeleton className="h-4 w-1/2" />
+    </div>
+  );
+
   return (
     <Layout>
-      {/* Page header banner */}
       <div className="bg-secondary/50 border-b border-border">
         <div className="container px-4 py-6 md:py-8">
           <div className="text-xs text-muted-foreground mb-2">
@@ -158,16 +169,13 @@ const Products = () => {
 
       <div className="container px-4 py-6 md:py-8">
         <div className="flex gap-8">
-          {/* Desktop sidebar */}
           <aside className="hidden md:block w-60 shrink-0">
             <div className="sticky top-32 bg-card border border-border rounded-xl p-5">
               <FilterSidebar />
             </div>
           </aside>
 
-          {/* Main */}
           <div className="flex-1 min-w-0">
-            {/* Toolbar */}
             <div className="flex items-center gap-3 mb-5">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -187,7 +195,6 @@ const Products = () => {
                   <SelectItem value="newest">Newest First</SelectItem>
                   <SelectItem value="price-low">Price: Low → High</SelectItem>
                   <SelectItem value="price-high">Price: High → Low</SelectItem>
-                  <SelectItem value="rating">Top Rated</SelectItem>
                 </SelectContent>
               </Select>
               <div className="hidden sm:flex border border-border rounded-full overflow-hidden">
@@ -204,7 +211,6 @@ const Products = () => {
               </Button>
             </div>
 
-            {/* Active filter chips */}
             {activeFiltersCount > 0 && (
               <div className="flex flex-wrap gap-2 mb-4">
                 {activeCategory !== "all" && (
@@ -212,12 +218,9 @@ const Products = () => {
                     {activeCategory} <button onClick={() => setSearchParams({})}><X className="h-3 w-3" /></button>
                   </Badge>
                 )}
-                {onlyNew && <Badge variant="secondary" className="rounded-full gap-1 pr-1">New <button onClick={() => setOnlyNew(false)}><X className="h-3 w-3" /></button></Badge>}
-                {onlyBestseller && <Badge variant="secondary" className="rounded-full gap-1 pr-1">Bestseller <button onClick={() => setOnlyBestseller(false)}><X className="h-3 w-3" /></button></Badge>}
               </div>
             )}
 
-            {/* Mobile filter chips */}
             <div className="flex gap-2 overflow-x-auto pb-3 md:hidden scrollbar-hide">
               {categories.map(cat => (
                 <Badge key={cat.value} variant={activeCategory === cat.value ? "default" : "outline"}
@@ -228,8 +231,11 @@ const Products = () => {
               ))}
             </div>
 
-            {/* Product grid / list */}
-            {filtered.length === 0 ? (
+            {loading ? (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+                {Array.from({ length: 6 }).map((_, i) => <ProductSkeleton key={i} />)}
+              </div>
+            ) : filtered.length === 0 ? (
               <div className="text-center py-20">
                 <ShoppingBag className="h-12 w-12 mx-auto text-muted-foreground/30 mb-4" />
                 <p className="font-semibold mb-2">No products found</p>
@@ -239,22 +245,19 @@ const Products = () => {
             ) : viewMode === "grid" ? (
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
                 {filtered.map((product, i) => {
-                  const discount = Math.round((1 - product.price / product.originalPrice) * 100);
+                  const discount = getDiscount(product);
                   const isHovered = hoveredId === product.id;
                   return (
                     <motion.div key={product.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: i * 0.04 }}
                       onMouseEnter={() => setHoveredId(product.id)} onMouseLeave={() => setHoveredId(null)}>
                       <div className="group relative">
-                        <Link to={`/products/${product.id}`} className="block">
+                        <Link to={`/products/${product.slug}`} className="block">
                           <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-secondary mb-2.5">
-                            <img src={isHovered ? product.image2 : product.image} alt={product.name}
+                            <img src={isHovered ? getImage(product, 1) : getImage(product, 0)} alt={product.name}
                               className="w-full h-full object-cover transition-all duration-500" loading="lazy" />
                             {discount > 0 && <Badge variant="destructive" className="absolute top-2 left-2 text-[10px]">-{discount}%</Badge>}
-                            {product.isNew && <Badge className="absolute top-2 right-2 bg-accent text-accent-foreground text-[10px]">New</Badge>}
-                            {product.isBestseller && !product.isNew && <Badge className="absolute top-2 right-2 bg-primary text-primary-foreground text-[10px]">Bestseller</Badge>}
                           </div>
                         </Link>
-                        {/* Quick actions */}
                         <div className="absolute bottom-[calc(2.5rem+2.5rem)] right-2 flex flex-col gap-1.5 opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0">
                           <Button size="icon" variant="secondary" className="h-8 w-8 rounded-full shadow-md" onClick={(e) => { e.preventDefault(); setQuickView(product); }}>
                             <Eye className="h-3.5 w-3.5" />
@@ -266,20 +269,16 @@ const Products = () => {
                             <ShoppingBag className="h-3.5 w-3.5" />
                           </Button>
                         </div>
-                        <Link to={`/products/${product.id}`}>
-                          <div className="flex items-center gap-1 mb-0.5">
-                            <div className="flex">{Array.from({ length: 5 }).map((_, j) => <Star key={j} className={`h-2.5 w-2.5 ${j < Math.floor(product.rating) ? "fill-accent text-accent" : "text-muted"}`} />)}</div>
-                            <span className="text-[10px] text-muted-foreground">({product.reviews})</span>
-                          </div>
+                        <Link to={`/products/${product.slug}`}>
                           <h3 className="font-medium text-sm line-clamp-1">{product.name}</h3>
-                          {product.colors.length > 0 && (
+                          {product.colors && product.colors.length > 0 && (
                             <div className="flex gap-1 mt-1">
                               {product.colors.map(c => <span key={c} className="text-[9px] text-muted-foreground bg-secondary px-1.5 py-0.5 rounded">{c}</span>)}
                             </div>
                           )}
                           <div className="flex items-center gap-2 mt-1.5">
                             <span className="text-accent font-bold text-sm">₹{product.price.toLocaleString()}</span>
-                            <span className="text-xs text-muted-foreground line-through">₹{product.originalPrice.toLocaleString()}</span>
+                            {product.original_price && <span className="text-xs text-muted-foreground line-through">₹{product.original_price.toLocaleString()}</span>}
                           </div>
                         </Link>
                       </div>
@@ -290,29 +289,20 @@ const Products = () => {
             ) : (
               <div className="space-y-3">
                 {filtered.map((product, i) => {
-                  const discount = Math.round((1 - product.price / product.originalPrice) * 100);
+                  const discount = getDiscount(product);
                   return (
                     <motion.div key={product.id} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}>
-                      <Link to={`/products/${product.id}`} className="group flex gap-4 bg-card border border-border rounded-xl p-3 hover:shadow-md transition-shadow">
+                      <Link to={`/products/${product.slug}`} className="group flex gap-4 bg-card border border-border rounded-xl p-3 hover:shadow-md transition-shadow">
                         <div className="w-28 h-36 md:w-32 md:h-40 rounded-lg overflow-hidden bg-secondary shrink-0">
-                          <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                          <img src={getImage(product)} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                         </div>
                         <div className="flex-1 min-w-0 py-1">
-                          <div className="flex items-start justify-between gap-2">
-                            <div>
-                              <p className="text-[10px] text-muted-foreground uppercase tracking-wider capitalize">{product.category}</p>
-                              <h3 className="font-semibold text-sm md:text-base">{product.name}</h3>
-                            </div>
-                            {product.isNew && <Badge className="bg-accent text-accent-foreground text-[9px] shrink-0">New</Badge>}
-                          </div>
-                          <div className="flex items-center gap-1 mt-1">
-                            {Array.from({ length: 5 }).map((_, j) => <Star key={j} className={`h-3 w-3 ${j < Math.floor(product.rating) ? "fill-accent text-accent" : "text-muted"}`} />)}
-                            <span className="text-xs text-muted-foreground ml-1">{product.rating} ({product.reviews})</span>
-                          </div>
-                          {product.colors.length > 0 && <p className="text-xs text-muted-foreground mt-1.5">{product.colors.join(", ")}</p>}
+                          <p className="text-[10px] text-muted-foreground uppercase tracking-wider capitalize">{product.category}</p>
+                          <h3 className="font-semibold text-sm md:text-base">{product.name}</h3>
+                          {product.colors && product.colors.length > 0 && <p className="text-xs text-muted-foreground mt-1.5">{product.colors.join(", ")}</p>}
                           <div className="flex items-center gap-2 mt-2">
                             <span className="text-accent font-bold">₹{product.price.toLocaleString()}</span>
-                            <span className="text-sm text-muted-foreground line-through">₹{product.originalPrice.toLocaleString()}</span>
+                            {product.original_price && <span className="text-sm text-muted-foreground line-through">₹{product.original_price.toLocaleString()}</span>}
                             {discount > 0 && <Badge variant="destructive" className="text-[10px]">-{discount}%</Badge>}
                           </div>
                           <div className="flex gap-2 mt-3">
@@ -332,18 +322,6 @@ const Products = () => {
                 })}
               </div>
             )}
-
-            {/* Pagination */}
-            {filtered.length > 0 && (
-              <div className="flex items-center justify-center gap-2 mt-10">
-                <Button variant="outline" size="sm" className="rounded-full" disabled>Previous</Button>
-                {[1, 2, 3].map(p => (
-                  <Button key={p} variant={p === 1 ? "default" : "outline"} size="sm"
-                    className={`rounded-full w-9 h-9 ${p === 1 ? "bg-accent text-accent-foreground" : ""}`}>{p}</Button>
-                ))}
-                <Button variant="outline" size="sm" className="rounded-full">Next</Button>
-              </div>
-            )}
           </div>
         </div>
       </div>
@@ -355,20 +333,16 @@ const Products = () => {
           {quickView && (
             <div className="grid md:grid-cols-2">
               <div className="aspect-square bg-secondary">
-                <img src={quickView.image} alt={quickView.name} className="w-full h-full object-cover" />
+                <img src={getImage(quickView)} alt={quickView.name} className="w-full h-full object-cover" />
               </div>
               <div className="p-6">
                 <Badge className="bg-accent text-accent-foreground text-[10px] mb-2 capitalize">{quickView.category}</Badge>
                 <h2 className="text-xl font-bold mb-2">{quickView.name}</h2>
-                <div className="flex items-center gap-1 mb-3">
-                  {Array.from({ length: 5 }).map((_, j) => <Star key={j} className={`h-3.5 w-3.5 ${j < Math.floor(quickView.rating) ? "fill-accent text-accent" : "text-muted"}`} />)}
-                  <span className="text-xs text-muted-foreground ml-1">({quickView.reviews} reviews)</span>
-                </div>
                 <div className="flex items-baseline gap-2 mb-4">
                   <span className="text-2xl font-bold text-accent">₹{quickView.price.toLocaleString()}</span>
-                  <span className="text-muted-foreground line-through">₹{quickView.originalPrice.toLocaleString()}</span>
+                  {quickView.original_price && <span className="text-muted-foreground line-through">₹{quickView.original_price.toLocaleString()}</span>}
                 </div>
-                {quickView.colors.length > 0 && (
+                {quickView.colors && quickView.colors.length > 0 && (
                   <div className="mb-4">
                     <p className="text-xs font-medium mb-2">Colors:</p>
                     <div className="flex gap-2">{quickView.colors.map(c => <Badge key={c} variant="outline" className="rounded-full">{c}</Badge>)}</div>
@@ -379,7 +353,7 @@ const Products = () => {
                     <ShoppingBag className="h-4 w-4 mr-2" /> Add to Cart
                   </Button>
                   <Button variant="outline" className="rounded-full" asChild>
-                    <Link to={`/products/${quickView.id}`} onClick={() => setQuickView(null)}>View Details</Link>
+                    <Link to={`/products/${quickView.slug}`} onClick={() => setQuickView(null)}>View Details</Link>
                   </Button>
                 </div>
               </div>
