@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      appointments: {
+        Row: {
+          appointment_type: string
+          created_at: string
+          email: string | null
+          id: string
+          name: string
+          notes: string | null
+          phone: string | null
+          preferred_date: string
+          preferred_time: string
+          session_id: string | null
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          appointment_type?: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          phone?: string | null
+          preferred_date: string
+          preferred_time: string
+          session_id?: string | null
+          status?: string
+          user_id?: string | null
+        }
+        Update: {
+          appointment_type?: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          preferred_date?: string
+          preferred_time?: string
+          session_id?: string | null
+          status?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       coupons: {
         Row: {
           code: string
@@ -245,6 +290,48 @@ export type Database = {
           subcategory?: string | null
           updated_at?: string
           video_url?: string | null
+        }
+        Relationships: []
+      }
+      saved_designs: {
+        Row: {
+          color: string | null
+          created_at: string
+          description: string | null
+          fabric: string | null
+          id: string
+          image_url: string | null
+          name: string
+          notes: string | null
+          session_id: string | null
+          style: string | null
+          user_id: string | null
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          fabric?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          notes?: string | null
+          session_id?: string | null
+          style?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          fabric?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          notes?: string | null
+          session_id?: string | null
+          style?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
