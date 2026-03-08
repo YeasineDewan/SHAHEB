@@ -4,6 +4,7 @@ import { Menu, X, ShoppingBag, User, Search, Heart, ChevronDown } from "lucide-r
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useCart } from "@/contexts/CartContext";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import logoImg from "@/assets/logo.png";
