@@ -15,10 +15,12 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useCart } from "@/contexts/CartContext";
 import type { Tables } from "@/integrations/supabase/types";
 
 const ProductDetail = () => {
   const { id } = useParams();
+  const { addItem } = useCart();
   const [product, setProduct] = useState<Tables<"products"> | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<Tables<"products">[]>([]);
   const [loading, setLoading] = useState(true);
@@ -113,6 +115,18 @@ const ProductDetail = () => {
       toast({ title: "Please select a size", variant: "destructive" });
       return;
     }
+    addItem({
+      product_id: product.id,
+      name: product.name,
+      price: product.price,
+      original_price: product.original_price,
+      image: images[0],
+      size: selectedSize || "",
+      color: selectedColor || "",
+      quantity,
+      is_digital: product.is_digital || false,
+      slug: product.slug,
+    });
     toast({ title: "Added to cart!", description: `${product.name}${selectedColor ? ` (${selectedColor})` : ""}${selectedSize ? `, ${selectedSize}` : ""} × ${quantity}` });
   };
 
