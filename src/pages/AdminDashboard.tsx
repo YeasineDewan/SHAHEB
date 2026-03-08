@@ -885,92 +885,462 @@ const AdminDashboard = () => {
             </div>
           )}
 
-          {/* ======================== SEO ======================== */}
+          {/* ======================== SEO & MARKETING ======================== */}
           {activeTab === "seo" && (
             <div className="space-y-6 max-w-3xl">
-              <h2 className="font-bold text-lg">SEO Settings</h2>
+              <div>
+                <h2 className="font-bold text-lg">SEO & Marketing</h2>
+                <p className="text-xs text-muted-foreground mt-0.5">Optimize your store for search engines, social sharing, and marketing pixels</p>
+              </div>
 
               <Tabs defaultValue="general">
-                <TabsList className="bg-transparent border-b rounded-none p-0 h-auto">
+                <TabsList className="bg-transparent border-b rounded-none p-0 h-auto flex-wrap">
                   <TabsTrigger value="general" className="rounded-none border-b-2 border-transparent data-[state=active]:border-accent data-[state=active]:bg-transparent px-4 py-3 text-xs">General</TabsTrigger>
                   <TabsTrigger value="pages" className="rounded-none border-b-2 border-transparent data-[state=active]:border-accent data-[state=active]:bg-transparent px-4 py-3 text-xs">Page SEO</TabsTrigger>
-                  <TabsTrigger value="social" className="rounded-none border-b-2 border-transparent data-[state=active]:border-accent data-[state=active]:bg-transparent px-4 py-3 text-xs">Social Media</TabsTrigger>
-                  <TabsTrigger value="advanced" className="rounded-none border-b-2 border-transparent data-[state=active]:border-accent data-[state=active]:bg-transparent px-4 py-3 text-xs">Advanced</TabsTrigger>
+                  <TabsTrigger value="social" className="rounded-none border-b-2 border-transparent data-[state=active]:border-accent data-[state=active]:bg-transparent px-4 py-3 text-xs">Social / OG</TabsTrigger>
+                  <TabsTrigger value="pixels" className="rounded-none border-b-2 border-transparent data-[state=active]:border-accent data-[state=active]:bg-transparent px-4 py-3 text-xs">Pixels & Analytics</TabsTrigger>
+                  <TabsTrigger value="sitemap" className="rounded-none border-b-2 border-transparent data-[state=active]:border-accent data-[state=active]:bg-transparent px-4 py-3 text-xs">Sitemap & Indexing</TabsTrigger>
+                  <TabsTrigger value="schema" className="rounded-none border-b-2 border-transparent data-[state=active]:border-accent data-[state=active]:bg-transparent px-4 py-3 text-xs">Schema / JSON-LD</TabsTrigger>
                 </TabsList>
 
+                {/* ---- GENERAL ---- */}
                 <TabsContent value="general" className="pt-6 space-y-4">
-                  <div className="bg-card border border-border rounded-xl p-6 space-y-4">
-                    <h3 className="font-semibold text-sm">Global Meta Tags</h3>
-                    <div className="space-y-2"><Label className="text-xs">Site Title</Label><Input defaultValue="SHAHEB — Premium Men's Fashion & Digital Products" /><p className="text-[10px] text-muted-foreground">56/60 characters</p></div>
-                    <div className="space-y-2"><Label className="text-xs">Meta Description</Label><Textarea defaultValue="Shop premium men's clothing, ethnic wear, jackets & digital style guides at SHAHEB. Free shipping on orders above ₹999. Genuine products guaranteed." className="h-20" /><p className="text-[10px] text-muted-foreground">148/160 characters</p></div>
-                    <div className="space-y-2"><Label className="text-xs">Meta Keywords</Label><Input defaultValue="men's fashion, ethnic wear, kurta, shirts, jackets, style guide" /></div>
-                    <div className="space-y-2"><Label className="text-xs">Canonical URL</Label><Input defaultValue="https://shaheb.com" /></div>
-                    <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full text-xs gap-1"><Save className="h-3.5 w-3.5" /> Save SEO Settings</Button>
+                  <div className="bg-card border border-border rounded-xl p-6 space-y-5">
+                    <div className="flex items-center gap-3 mb-1">
+                      <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center"><Globe className="h-4 w-4 text-accent" /></div>
+                      <div>
+                        <h3 className="font-semibold text-sm">Global Meta Tags</h3>
+                        <p className="text-[10px] text-muted-foreground">Default meta tags applied site-wide unless overridden per page</p>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Site Title</Label>
+                      <Input defaultValue="SHAHEB — Premium Men's Fashion & Digital Products" />
+                      <p className="text-[10px] text-muted-foreground">56/60 characters — <span className="text-green-600 dark:text-green-400">Good</span></p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Meta Description</Label>
+                      <Textarea defaultValue="Shop premium men's clothing, ethnic wear, jackets & digital style guides at SHAHEB. Free shipping on orders above ₹999. Genuine products guaranteed." className="h-20" />
+                      <p className="text-[10px] text-muted-foreground">148/160 characters — <span className="text-green-600 dark:text-green-400">Good</span></p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Meta Keywords</Label>
+                      <Input defaultValue="men's fashion, ethnic wear, kurta, shirts, jackets, style guide" />
+                      <p className="text-[10px] text-muted-foreground">Comma separated — used by some search engines</p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2"><Label className="text-xs">Canonical URL</Label><Input defaultValue="https://shaheb.com" /></div>
+                      <div className="space-y-2"><Label className="text-xs">Language / Locale</Label>
+                        <Select defaultValue="en_IN">
+                          <SelectTrigger className="h-10"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="en_IN">English (India)</SelectItem>
+                            <SelectItem value="en_US">English (US)</SelectItem>
+                            <SelectItem value="hi_IN">Hindi (India)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
                   </div>
+
+                  {/* Google Search Preview */}
+                  <div className="bg-card border border-border rounded-xl p-6 space-y-3">
+                    <h3 className="font-semibold text-sm flex items-center gap-2"><Eye className="h-4 w-4 text-accent" /> Google Search Preview</h3>
+                    <div className="bg-background border border-border rounded-lg p-4 space-y-1">
+                      <p className="text-sm text-blue-600 dark:text-blue-400 font-medium truncate">SHAHEB — Premium Men's Fashion & Digital Products</p>
+                      <p className="text-[11px] text-green-700 dark:text-green-500">https://shaheb.com</p>
+                      <p className="text-xs text-muted-foreground line-clamp-2">Shop premium men's clothing, ethnic wear, jackets & digital style guides at SHAHEB. Free shipping on orders above ₹999. Genuine products guaranteed.</p>
+                    </div>
+                  </div>
+
+                  <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full text-xs gap-1" onClick={() => toast({ title: "SEO settings saved!" })}><Save className="h-3.5 w-3.5" /> Save SEO Settings</Button>
                 </TabsContent>
 
+                {/* ---- PAGE SEO ---- */}
                 <TabsContent value="pages" className="pt-6 space-y-4">
+                  <p className="text-xs text-muted-foreground">Override meta tags for individual pages. Leave blank to use global defaults.</p>
                   {[
-                    { page: "Home", title: "SHAHEB — Premium Men's Fashion", desc: "Shop premium men's clothing..." },
-                    { page: "Products", title: "All Products — SHAHEB", desc: "Browse our collection..." },
-                    { page: "About", title: "About Us — SHAHEB", desc: "Learn about our story..." },
-                    { page: "Contact", title: "Contact Us — SHAHEB", desc: "Get in touch with us..." },
+                    { page: "Home", path: "/", title: "SHAHEB — Premium Men's Fashion", desc: "Shop premium men's clothing, ethnic wear, jackets & digital style guides.", index: true },
+                    { page: "Products", path: "/products", title: "All Products — SHAHEB", desc: "Browse our complete collection of shirts, trousers, jackets & more.", index: true },
+                    { page: "About", path: "/about", title: "About Us — SHAHEB", desc: "Learn about our story, mission and commitment to quality.", index: true },
+                    { page: "Contact", path: "/contact", title: "Contact Us — SHAHEB", desc: "Get in touch with our support team.", index: true },
+                    { page: "FAQ", path: "/faq", title: "FAQ — SHAHEB", desc: "Frequently asked questions about orders, returns and more.", index: true },
+                    { page: "Cart", path: "/cart", title: "Shopping Cart — SHAHEB", desc: "", index: false },
+                    { page: "Checkout", path: "/checkout", title: "Checkout — SHAHEB", desc: "", index: false },
                   ].map(p => (
                     <div key={p.page} className="bg-card border border-border rounded-xl p-5">
                       <div className="flex items-center justify-between mb-3">
-                        <h3 className="font-semibold text-sm">{p.page} Page</h3>
-                        <Badge variant="outline" className="text-[10px]">/{p.page.toLowerCase()}</Badge>
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-semibold text-sm">{p.page}</h3>
+                          <Badge variant="outline" className="text-[10px] font-mono">{p.path}</Badge>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] text-muted-foreground">Index</span>
+                          <Switch defaultChecked={p.index} />
+                        </div>
                       </div>
-                      <div className="space-y-3">
-                        <div className="space-y-1"><Label className="text-[10px]">Title</Label><Input defaultValue={p.title} className="h-9 text-xs" /></div>
-                        <div className="space-y-1"><Label className="text-[10px]">Description</Label><Input defaultValue={p.desc} className="h-9 text-xs" /></div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div className="space-y-1"><Label className="text-[10px]">Title Tag</Label><Input defaultValue={p.title} className="h-9 text-xs" /></div>
+                        <div className="space-y-1"><Label className="text-[10px]">Meta Description</Label><Input defaultValue={p.desc} className="h-9 text-xs" /></div>
                       </div>
                     </div>
                   ))}
-                  <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full text-xs gap-1"><Save className="h-3.5 w-3.5" /> Save All</Button>
+                  <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full text-xs gap-1" onClick={() => toast({ title: "Page SEO saved!" })}><Save className="h-3.5 w-3.5" /> Save All Pages</Button>
                 </TabsContent>
 
+                {/* ---- SOCIAL / OG ---- */}
                 <TabsContent value="social" className="pt-6 space-y-4">
                   <div className="bg-card border border-border rounded-xl p-6 space-y-4">
-                    <h3 className="font-semibold text-sm">Open Graph (Facebook/LinkedIn)</h3>
-                    <div className="space-y-2"><Label className="text-xs">OG Title</Label><Input defaultValue="SHAHEB — Premium Men's Fashion" /></div>
-                    <div className="space-y-2"><Label className="text-xs">OG Description</Label><Textarea defaultValue="Shop premium men's fashion at SHAHEB" className="h-16" /></div>
-                    <div className="space-y-2">
-                      <Label className="text-xs">OG Image</Label>
-                      <ImageDropZone aspectRatio="aspect-video" placeholder="Drop OG image (1200×630px recommended)" maxSizeMB={2} />
+                    <div className="flex items-center gap-3 mb-1">
+                      <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center"><Globe className="h-4 w-4 text-blue-500" /></div>
+                      <div>
+                        <h3 className="font-semibold text-sm">Open Graph (Facebook / LinkedIn / WhatsApp)</h3>
+                        <p className="text-[10px] text-muted-foreground">Controls how your links appear when shared on social platforms</p>
+                      </div>
                     </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2"><Label className="text-xs">OG Title</Label><Input defaultValue="SHAHEB — Premium Men's Fashion" /></div>
+                      <div className="space-y-2"><Label className="text-xs">OG Type</Label>
+                        <Select defaultValue="website">
+                          <SelectTrigger className="h-10"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="website">website</SelectItem>
+                            <SelectItem value="product">product</SelectItem>
+                            <SelectItem value="article">article</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <div className="space-y-2"><Label className="text-xs">OG Description</Label><Textarea defaultValue="Shop premium men's fashion at SHAHEB. Shirts, ethnic wear, jackets & digital products." className="h-16" /></div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">OG Image (1200×630px recommended)</Label>
+                      <ImageDropZone aspectRatio="aspect-video" placeholder="Drop OG image here" maxSizeMB={2} />
+                    </div>
+                    <div className="space-y-2"><Label className="text-xs">OG URL</Label><Input defaultValue="https://shaheb.com" /></div>
                   </div>
+
                   <div className="bg-card border border-border rounded-xl p-6 space-y-4">
-                    <h3 className="font-semibold text-sm">Twitter Card</h3>
-                    <div className="space-y-2"><Label className="text-xs">Twitter Handle</Label><Input defaultValue="@shaheb_fashion" /></div>
-                    <div className="space-y-2">
-                      <Label className="text-xs">Card Type</Label>
-                      <Select defaultValue="summary_large_image">
-                        <SelectTrigger className="h-10"><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="summary">Summary</SelectItem>
-                          <SelectItem value="summary_large_image">Summary Large Image</SelectItem>
-                        </SelectContent>
-                      </Select>
+                    <div className="flex items-center gap-3 mb-1">
+                      <div className="w-8 h-8 rounded-full bg-sky-500/10 flex items-center justify-center"><Type className="h-4 w-4 text-sky-500" /></div>
+                      <div>
+                        <h3 className="font-semibold text-sm">Twitter / X Card</h3>
+                        <p className="text-[10px] text-muted-foreground">Optimize how links appear on Twitter/X</p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2"><Label className="text-xs">Twitter Handle</Label><Input defaultValue="@shaheb_fashion" /></div>
+                      <div className="space-y-2">
+                        <Label className="text-xs">Card Type</Label>
+                        <Select defaultValue="summary_large_image">
+                          <SelectTrigger className="h-10"><SelectValue /></SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="summary">Summary</SelectItem>
+                            <SelectItem value="summary_large_image">Summary Large Image</SelectItem>
+                            <SelectItem value="player">Player</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <div className="space-y-2"><Label className="text-xs">Twitter Title (override)</Label><Input placeholder="Leave blank to use OG Title" className="h-9 text-xs" /></div>
+                    <div className="space-y-2"><Label className="text-xs">Twitter Description (override)</Label><Input placeholder="Leave blank to use OG Description" className="h-9 text-xs" /></div>
+                  </div>
+
+                  {/* Social Share Preview */}
+                  <div className="bg-card border border-border rounded-xl p-6 space-y-3">
+                    <h3 className="font-semibold text-sm flex items-center gap-2"><Eye className="h-4 w-4 text-accent" /> Social Share Preview</h3>
+                    <div className="bg-secondary/50 rounded-lg overflow-hidden max-w-sm">
+                      <div className="aspect-video bg-secondary flex items-center justify-center text-muted-foreground text-xs">
+                        <Image className="h-8 w-8" />
+                      </div>
+                      <div className="p-3 space-y-1">
+                        <p className="text-[10px] text-muted-foreground uppercase">shaheb.com</p>
+                        <p className="text-sm font-semibold line-clamp-1">SHAHEB — Premium Men's Fashion</p>
+                        <p className="text-xs text-muted-foreground line-clamp-2">Shop premium men's fashion at SHAHEB. Shirts, ethnic wear, jackets & digital products.</p>
+                      </div>
                     </div>
                   </div>
-                  <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full text-xs gap-1"><Save className="h-3.5 w-3.5" /> Save Social</Button>
+
+                  <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full text-xs gap-1" onClick={() => toast({ title: "Social settings saved!" })}><Save className="h-3.5 w-3.5" /> Save Social</Button>
                 </TabsContent>
 
-                <TabsContent value="advanced" className="pt-6 space-y-4">
+                {/* ---- PIXELS & ANALYTICS ---- */}
+                <TabsContent value="pixels" className="pt-6 space-y-4">
+                  {/* Facebook / Meta Pixel */}
                   <div className="bg-card border border-border rounded-xl p-6 space-y-4">
-                    <h3 className="font-semibold text-sm">Structured Data (JSON-LD)</h3>
-                    <div className="flex items-center justify-between"><span className="text-sm">Organization Schema</span><Switch defaultChecked /></div>
-                    <div className="flex items-center justify-between"><span className="text-sm">Product Schema</span><Switch defaultChecked /></div>
-                    <div className="flex items-center justify-between"><span className="text-sm">Breadcrumb Schema</span><Switch defaultChecked /></div>
-                    <div className="flex items-center justify-between"><span className="text-sm">FAQ Schema</span><Switch defaultChecked /></div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-blue-600/10 flex items-center justify-center text-blue-600 font-bold text-xs">f</div>
+                        <div>
+                          <h3 className="font-semibold text-sm">Facebook / Meta Pixel</h3>
+                          <p className="text-[10px] text-muted-foreground">Track conversions, optimize ads & build audiences</p>
+                        </div>
+                      </div>
+                      <Switch defaultChecked />
+                    </div>
+                    <Separator />
+                    <div className="space-y-2"><Label className="text-xs">Pixel ID *</Label><Input placeholder="e.g. 123456789012345" className="font-mono" /><p className="text-[10px] text-muted-foreground">Find this in Meta Events Manager → Data Sources → Your Pixel</p></div>
+                    <div className="space-y-2"><Label className="text-xs">Conversions API Access Token</Label><Input placeholder="EAAxxxxxxxxx..." type="password" /><p className="text-[10px] text-muted-foreground">Optional — enables server-side tracking for better accuracy</p></div>
+                    <div className="bg-secondary/30 rounded-lg p-4 space-y-3">
+                      <p className="text-xs font-medium">Events to Track</p>
+                      {["PageView", "ViewContent", "AddToCart", "InitiateCheckout", "Purchase", "Search", "AddToWishlist", "CompleteRegistration"].map(evt => (
+                        <div key={evt} className="flex items-center justify-between">
+                          <span className="text-xs font-mono">{evt}</span>
+                          <Switch defaultChecked />
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="text-sm">Advanced Matching</span>
+                        <p className="text-[10px] text-muted-foreground">Send hashed customer data for better attribution</p>
+                      </div>
+                      <Switch defaultChecked />
+                    </div>
                   </div>
+
+                  {/* Google Analytics 4 */}
                   <div className="bg-card border border-border rounded-xl p-6 space-y-4">
-                    <h3 className="font-semibold text-sm">Indexing</h3>
-                    <div className="space-y-2"><Label className="text-xs">Robots.txt</Label><Textarea defaultValue={"User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /dashboard\nSitemap: https://shaheb.com/sitemap.xml"} className="font-mono text-xs h-24" /></div>
-                    <div className="space-y-2"><Label className="text-xs">Google Verification Code</Label><Input placeholder="google-site-verification=..." /></div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-600 font-bold text-xs">G</div>
+                        <div>
+                          <h3 className="font-semibold text-sm">Google Analytics 4</h3>
+                          <p className="text-[10px] text-muted-foreground">Track traffic, conversions & user behavior</p>
+                        </div>
+                      </div>
+                      <Switch defaultChecked />
+                    </div>
+                    <Separator />
+                    <div className="space-y-2"><Label className="text-xs">Measurement ID *</Label><Input placeholder="G-XXXXXXXXXX" className="font-mono" /><p className="text-[10px] text-muted-foreground">Found in GA4 → Admin → Data Streams → Web</p></div>
+                    <div className="flex items-center justify-between">
+                      <div><span className="text-sm">Enhanced Ecommerce</span><p className="text-[10px] text-muted-foreground">Track product views, add-to-cart & purchases</p></div>
+                      <Switch defaultChecked />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div><span className="text-sm">Enhanced Link Attribution</span><p className="text-[10px] text-muted-foreground">Differentiate clicks on same-URL links</p></div>
+                      <Switch />
+                    </div>
                   </div>
-                  <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full text-xs gap-1"><Save className="h-3.5 w-3.5" /> Save Advanced</Button>
+
+                  {/* Google Tag Manager */}
+                  <div className="bg-card border border-border rounded-xl p-6 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-500 font-bold text-xs">GTM</div>
+                        <div>
+                          <h3 className="font-semibold text-sm">Google Tag Manager</h3>
+                          <p className="text-[10px] text-muted-foreground">Manage all marketing tags from one container</p>
+                        </div>
+                      </div>
+                      <Switch />
+                    </div>
+                    <Separator />
+                    <div className="space-y-2"><Label className="text-xs">Container ID</Label><Input placeholder="GTM-XXXXXXX" className="font-mono" /></div>
+                  </div>
+
+                  {/* Google Ads */}
+                  <div className="bg-card border border-border rounded-xl p-6 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-green-500/10 flex items-center justify-center text-green-600 font-bold text-xs">Ads</div>
+                        <div>
+                          <h3 className="font-semibold text-sm">Google Ads Conversion</h3>
+                          <p className="text-[10px] text-muted-foreground">Track Google Ads conversions & remarketing</p>
+                        </div>
+                      </div>
+                      <Switch />
+                    </div>
+                    <Separator />
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2"><Label className="text-xs">Conversion ID</Label><Input placeholder="AW-XXXXXXXXX" className="font-mono" /></div>
+                      <div className="space-y-2"><Label className="text-xs">Conversion Label</Label><Input placeholder="xxxxxxxxx" className="font-mono" /></div>
+                    </div>
+                  </div>
+
+                  {/* TikTok Pixel */}
+                  <div className="bg-card border border-border rounded-xl p-6 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-foreground/10 flex items-center justify-center font-bold text-xs">TT</div>
+                        <div>
+                          <h3 className="font-semibold text-sm">TikTok Pixel</h3>
+                          <p className="text-[10px] text-muted-foreground">Track conversions from TikTok ads</p>
+                        </div>
+                      </div>
+                      <Switch />
+                    </div>
+                    <Separator />
+                    <div className="space-y-2"><Label className="text-xs">Pixel ID</Label><Input placeholder="CXXXXXXXXXXXXXXXXX" className="font-mono" /></div>
+                  </div>
+
+                  {/* Snapchat */}
+                  <div className="bg-card border border-border rounded-xl p-6 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-yellow-400/10 flex items-center justify-center text-yellow-500 font-bold text-xs">S</div>
+                        <div>
+                          <h3 className="font-semibold text-sm">Snapchat Pixel</h3>
+                          <p className="text-[10px] text-muted-foreground">Measure Snap ad performance</p>
+                        </div>
+                      </div>
+                      <Switch />
+                    </div>
+                    <Separator />
+                    <div className="space-y-2"><Label className="text-xs">Pixel ID</Label><Input placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" className="font-mono" /></div>
+                  </div>
+
+                  {/* Pinterest */}
+                  <div className="bg-card border border-border rounded-xl p-6 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 font-bold text-xs">P</div>
+                        <div>
+                          <h3 className="font-semibold text-sm">Pinterest Tag</h3>
+                          <p className="text-[10px] text-muted-foreground">Track conversions from Pinterest</p>
+                        </div>
+                      </div>
+                      <Switch />
+                    </div>
+                    <Separator />
+                    <div className="space-y-2"><Label className="text-xs">Tag ID</Label><Input placeholder="1234567890123" className="font-mono" /></div>
+                  </div>
+
+                  {/* Custom Scripts */}
+                  <div className="bg-card border border-border rounded-xl p-6 space-y-4">
+                    <div className="flex items-center gap-3 mb-1">
+                      <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center"><FileText className="h-4 w-4 text-accent" /></div>
+                      <div>
+                        <h3 className="font-semibold text-sm">Custom Scripts</h3>
+                        <p className="text-[10px] text-muted-foreground">Add custom tracking code or third-party scripts</p>
+                      </div>
+                    </div>
+                    <div className="space-y-2"><Label className="text-xs">Head Scripts (before &lt;/head&gt;)</Label><Textarea placeholder="<!-- Paste your scripts here -->" className="font-mono text-xs h-24" /></div>
+                    <div className="space-y-2"><Label className="text-xs">Body Scripts (before &lt;/body&gt;)</Label><Textarea placeholder="<!-- Paste your scripts here -->" className="font-mono text-xs h-24" /></div>
+                  </div>
+
+                  <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full text-xs gap-1" onClick={() => toast({ title: "Pixels & analytics saved!" })}><Save className="h-3.5 w-3.5" /> Save Pixels & Analytics</Button>
+                </TabsContent>
+
+                {/* ---- SITEMAP & INDEXING ---- */}
+                <TabsContent value="sitemap" className="pt-6 space-y-4">
+                  <div className="bg-card border border-border rounded-xl p-6 space-y-4">
+                    <div className="flex items-center gap-3 mb-1">
+                      <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center"><Globe className="h-4 w-4 text-accent" /></div>
+                      <div>
+                        <h3 className="font-semibold text-sm">Robots.txt</h3>
+                        <p className="text-[10px] text-muted-foreground">Control which pages search engines can crawl</p>
+                      </div>
+                    </div>
+                    <Textarea defaultValue={"User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /dashboard\nDisallow: /cart\nDisallow: /checkout\nSitemap: https://shaheb.com/sitemap.xml"} className="font-mono text-xs h-32" />
+                  </div>
+
+                  <div className="bg-card border border-border rounded-xl p-6 space-y-4">
+                    <h3 className="font-semibold text-sm">XML Sitemap</h3>
+                    <div className="flex items-center justify-between">
+                      <div><span className="text-sm">Auto-generate Sitemap</span><p className="text-[10px] text-muted-foreground">Automatically update when products/pages change</p></div>
+                      <Switch defaultChecked />
+                    </div>
+                    <div className="space-y-2"><Label className="text-xs">Sitemap URL</Label><Input defaultValue="https://shaheb.com/sitemap.xml" readOnly className="bg-secondary/50 font-mono text-xs" /></div>
+                    {["Include Product Pages", "Include Category Pages", "Include Blog / Articles"].map((item, i) => (
+                      <div key={item} className="flex items-center justify-between">
+                        <span className="text-sm">{item}</span>
+                        <Switch defaultChecked={i < 2} />
+                      </div>
+                    ))}
+                    <Button variant="outline" className="rounded-full text-xs gap-1"><Download className="h-3.5 w-3.5" /> Download Sitemap</Button>
+                  </div>
+
+                  <div className="bg-card border border-border rounded-xl p-6 space-y-4">
+                    <h3 className="font-semibold text-sm">Search Engine Verification</h3>
+                    <div className="space-y-3">
+                      <div className="space-y-2"><Label className="text-xs">Google Search Console</Label><Input placeholder="google-site-verification=..." className="font-mono text-xs" /><p className="text-[10px] text-muted-foreground">Search Console → Settings → Ownership → HTML tag</p></div>
+                      <div className="space-y-2"><Label className="text-xs">Bing Webmaster Tools</Label><Input placeholder="msvalidate.01=..." className="font-mono text-xs" /></div>
+                      <div className="space-y-2"><Label className="text-xs">Yandex Webmaster</Label><Input placeholder="yandex-verification=..." className="font-mono text-xs" /></div>
+                      <div className="space-y-2"><Label className="text-xs">Pinterest Domain Claim</Label><Input placeholder="p:domain_verify content=..." className="font-mono text-xs" /></div>
+                    </div>
+                  </div>
+
+                  <div className="bg-card border border-border rounded-xl p-6 space-y-4">
+                    <h3 className="font-semibold text-sm">Crawl Settings</h3>
+                    {[
+                      { name: "Canonical Tags", desc: "Auto-add canonical URLs to prevent duplicate content", on: true },
+                      { name: "Hreflang Tags", desc: "Multi-language support for international SEO", on: false },
+                      { name: "Noindex Paginated Pages", desc: "Prevent /products?page=2 from being indexed", on: true },
+                    ].map(s => (
+                      <div key={s.name} className="flex items-center justify-between">
+                        <div><span className="text-sm">{s.name}</span><p className="text-[10px] text-muted-foreground">{s.desc}</p></div>
+                        <Switch defaultChecked={s.on} />
+                      </div>
+                    ))}
+                  </div>
+
+                  <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full text-xs gap-1" onClick={() => toast({ title: "Indexing settings saved!" })}><Save className="h-3.5 w-3.5" /> Save Indexing Settings</Button>
+                </TabsContent>
+
+                {/* ---- SCHEMA / JSON-LD ---- */}
+                <TabsContent value="schema" className="pt-6 space-y-4">
+                  <div className="bg-card border border-border rounded-xl p-6 space-y-4">
+                    <div className="flex items-center gap-3 mb-1">
+                      <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center"><FileText className="h-4 w-4 text-accent" /></div>
+                      <div>
+                        <h3 className="font-semibold text-sm">Structured Data (JSON-LD)</h3>
+                        <p className="text-[10px] text-muted-foreground">Rich snippets help your pages stand out in search results</p>
+                      </div>
+                    </div>
+                    {[
+                      { name: "Organization Schema", desc: "Company name, logo, social profiles, contact info", on: true },
+                      { name: "WebSite Schema", desc: "Enables sitelinks search box in Google", on: true },
+                      { name: "Product Schema", desc: "Price, availability, reviews for product pages", on: true },
+                      { name: "BreadcrumbList Schema", desc: "Breadcrumb navigation in search results", on: true },
+                      { name: "FAQ Schema", desc: "FAQ rich snippets with expandable answers", on: true },
+                      { name: "LocalBusiness Schema", desc: "Physical store address, hours, phone", on: false },
+                      { name: "Review / AggregateRating", desc: "Star ratings visible in search results", on: true },
+                      { name: "Offer / PriceRange", desc: "Price range for product listings", on: true },
+                      { name: "Article Schema", desc: "For blog posts and articles", on: false },
+                    ].map(s => (
+                      <div key={s.name} className="flex items-center justify-between py-2 border-b border-border last:border-0">
+                        <div><span className="text-sm font-medium">{s.name}</span><p className="text-[10px] text-muted-foreground">{s.desc}</p></div>
+                        <Switch defaultChecked={s.on} />
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="bg-card border border-border rounded-xl p-6 space-y-4">
+                    <h3 className="font-semibold text-sm">Organization Details (for schema)</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2"><Label className="text-xs">Legal Name</Label><Input defaultValue="SHAHEB Fashion Pvt. Ltd." /></div>
+                      <div className="space-y-2"><Label className="text-xs">Founded Year</Label><Input defaultValue="2024" type="number" /></div>
+                    </div>
+                    <div className="space-y-2"><Label className="text-xs">Logo URL</Label><Input defaultValue="https://shaheb.com/logo.png" className="font-mono text-xs" /></div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2"><Label className="text-xs">Contact Email</Label><Input defaultValue="support@shaheb.com" /></div>
+                      <div className="space-y-2"><Label className="text-xs">Contact Phone</Label><Input defaultValue="+91 98765 43210" /></div>
+                    </div>
+                    <div className="space-y-2"><Label className="text-xs">Address</Label><Input defaultValue="123 Fashion Street, Andheri West, Mumbai, MH 400058" /></div>
+                  </div>
+
+                  <div className="bg-card border border-border rounded-xl p-6 space-y-3">
+                    <h3 className="font-semibold text-sm">JSON-LD Preview</h3>
+                    <pre className="bg-secondary/50 rounded-lg p-4 text-[10px] font-mono text-muted-foreground overflow-x-auto">{`{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "SHAHEB",
+  "url": "https://shaheb.com",
+  "logo": "https://shaheb.com/logo.png",
+  "sameAs": [
+    "https://instagram.com/shaheb",
+    "https://x.com/shaheb",
+    "https://facebook.com/shaheb"
+  ],
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "telephone": "+91-98765-43210",
+    "contactType": "customer service"
+  }
+}`}</pre>
+                  </div>
+
+                  <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full text-xs gap-1" onClick={() => toast({ title: "Schema settings saved!" })}><Save className="h-3.5 w-3.5" /> Save Schema</Button>
                 </TabsContent>
               </Tabs>
             </div>
