@@ -60,6 +60,7 @@ const App = () => (
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
+    </CartProvider>
   </ThemeProvider>
 );
 
