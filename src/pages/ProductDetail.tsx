@@ -115,6 +115,18 @@ const ProductDetail = () => {
       toast({ title: "Please select a size", variant: "destructive" });
       return;
     }
+    addItem({
+      product_id: product.id,
+      name: product.name,
+      price: product.price,
+      original_price: product.original_price,
+      image: images[0],
+      size: selectedSize || "",
+      color: selectedColor || "",
+      quantity,
+      is_digital: product.is_digital || false,
+      slug: product.slug,
+    });
     toast({ title: "Added to cart!", description: `${product.name}${selectedColor ? ` (${selectedColor})` : ""}${selectedSize ? `, ${selectedSize}` : ""} × ${quantity}` });
   };
 
