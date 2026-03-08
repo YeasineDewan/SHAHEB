@@ -1,5 +1,7 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import type { Tables } from "@/integrations/supabase/types";
 import {
   LayoutDashboard, Package, ShoppingCart, Users, Tag, BarChart3, MessageSquare, Settings,
   Plus, Search, Eye, Edit, Trash2, DollarSign, TrendingUp, UserCheck, FileText,
