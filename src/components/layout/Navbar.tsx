@@ -66,6 +66,7 @@ export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const isMobile = useIsMobile();
   const location = useLocation();
+  const { itemCount } = useCart();
 
   if (isMobile) {
     return (
