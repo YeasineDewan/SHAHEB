@@ -42,41 +42,7 @@ const sidebarItems = [
   { id: "settings", icon: Settings, label: "Settings" },
 ];
 
-const mockProducts = [
-  { id: 1, name: "Classic Oxford Shirt", price: 2499, stock: 45, status: "Active", category: "Shirts", sku: "SHB-OXF-001" },
-  { id: 2, name: "Leather Jacket", price: 5999, stock: 12, status: "Active", category: "Jackets", sku: "SHB-LJK-002" },
-  { id: 3, name: "Premium Kurta Set", price: 3499, stock: 0, status: "Inactive", category: "Ethnic", sku: "SHB-KRT-003" },
-  { id: 4, name: "Style Guide eBook", price: 499, stock: 999, status: "Active", category: "Digital", sku: "SHB-DIG-004" },
-  { id: 5, name: "Slim Fit Chinos", price: 1999, stock: 67, status: "Active", category: "Trousers", sku: "SHB-CHN-005" },
-];
-
-const mockOrders = [
-  { id: "ORD-001", customer: "Arjun Mehta", email: "arjun@email.com", total: 10997, status: "Shipped", date: "Mar 5, 2026", items: 3, payment: "Card" },
-  { id: "ORD-002", customer: "Rahul Sharma", email: "rahul@email.com", total: 499, status: "Processing", date: "Mar 4, 2026", items: 1, payment: "UPI" },
-  { id: "ORD-003", customer: "Vikram Singh", email: "vikram@email.com", total: 6999, status: "Delivered", date: "Mar 3, 2026", items: 1, payment: "Card" },
-  { id: "ORD-004", customer: "Amit Patel", email: "amit@email.com", total: 3499, status: "Refunded", date: "Mar 2, 2026", items: 1, payment: "COD" },
-  { id: "ORD-005", customer: "Suresh Nair", email: "suresh@email.com", total: 2499, status: "Delivered", date: "Mar 1, 2026", items: 2, payment: "UPI" },
-];
-
-const mockInvoices = [
-  { id: "INV-2026-001", orderId: "ORD-001", customer: "Arjun Mehta", amount: 10997, tax: 1679, date: "Mar 5, 2026", status: "Paid" },
-  { id: "INV-2026-002", orderId: "ORD-002", customer: "Rahul Sharma", amount: 499, tax: 76, date: "Mar 4, 2026", status: "Paid" },
-  { id: "INV-2026-003", orderId: "ORD-003", customer: "Vikram Singh", amount: 6999, tax: 1069, date: "Mar 3, 2026", status: "Paid" },
-  { id: "INV-2026-004", orderId: "ORD-004", customer: "Amit Patel", amount: 3499, tax: 534, date: "Mar 2, 2026", status: "Refunded" },
-];
-
-const mockUsers = [
-  { id: 1, name: "Arjun Mehta", email: "arjun@email.com", phone: "+91 98765 43210", orders: 8, spent: 45890, status: "Active", joined: "Jan 15, 2026", lastLogin: "Mar 8, 2026" },
-  { id: 2, name: "Rahul Sharma", email: "rahul@email.com", phone: "+91 91234 56780", orders: 3, spent: 12499, status: "Active", joined: "Feb 1, 2026", lastLogin: "Mar 7, 2026" },
-  { id: 3, name: "Vikram Singh", email: "vikram@email.com", phone: "+91 87654 32100", orders: 1, spent: 6999, status: "Blocked", joined: "Feb 20, 2026", lastLogin: "Mar 3, 2026" },
-  { id: 4, name: "Amit Patel", email: "amit@email.com", phone: "+91 76543 21090", orders: 5, spent: 22450, status: "Active", joined: "Dec 10, 2025", lastLogin: "Mar 6, 2026" },
-];
-
-const mockCoupons = [
-  { code: "SHAHEB20", type: "Percentage", value: "20%", used: 134, limit: 500, expiry: "Apr 30, 2026", active: true },
-  { code: "FLAT500", type: "Flat", value: "₹500", used: 89, limit: 200, expiry: "Mar 31, 2026", active: true },
-  { code: "WELCOME10", type: "Percentage", value: "10%", used: 500, limit: 500, expiry: "Expired", active: false },
-];
+type OrderWithItems = Tables<"orders"> & { order_items: Tables<"order_items">[] };
 
 const mockBanners = [
   { id: 1, title: "Summer Collection 2026", location: "Hero Slider", image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=200&fit=crop", status: "Active", link: "/products?category=shirts" },
