@@ -179,6 +179,52 @@ const AdminDashboard = () => {
     toast({ title: "Coupon deleted" });
   };
 
+  const handleCreateProduct = async () => {
+    if (!productForm.name.trim() || !productForm.category.trim() || !productForm.price || !productForm.slug.trim()) {
+      toast({ title: "Missing fields", description: "Name, category, price and slug are required.", variant: "destructive" }); return;
+    }
+    setSavingProduct(true);
+    const { data, error } = await supabase.from("products").insert({
+      name: productForm.name.trim(),
+      category: productForm.category.trim(),
+      price: parseInt(productForm.price),
+      original_price: productForm.originalPrice ? parseInt(productForm.originalPrice) : null,
+      stock: productForm.stock ? parseInt(productForm.stock) : 0,
+      description: productForm.description.trim() || null,
+      slug: productForm.slug.trim().toLowerCase().replace(/\s+/g, "-"),
+      images: productForm.images ? productForm.images.split(",").map(s => s.trim()).filter(Boolean) : [],
+      sizes: productForm.sizes ? productForm.sizes.split(",").map(s => s.trim()).filter(Boolean) : [],
+      colors: productForm.colors ? productForm.colors.split(",").map(s => s.trim()).filter(Boolean) : [],
+    }).select().single();
+    setSavingProduct(false);
+    if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
+    if (data) setProducts(prev => [data, ...prev]);
+    setProductForm(emptyProduct);
+    setShowProductForm(false);
+    toast({ title: "Product created!" });
+  };
+
+  const handleCreateCoupon = async () => {
+    if (!couponForm.code.trim() || !couponForm.discount_value) {
+      toast({ title: "Missing fields", description: "Code and discount value are required.", variant: "destructive" }); return;
+    }
+    setSavingCoupon(true);
+    const { data, error } = await supabase.from("coupons").insert({
+      code: couponForm.code.trim().toUpperCase(),
+      discount_type: couponForm.discount_type,
+      discount_value: parseInt(couponForm.discount_value),
+      min_order_amount: couponForm.min_order_amount ? parseInt(couponForm.min_order_amount) : null,
+      max_uses: couponForm.max_uses ? parseInt(couponForm.max_uses) : null,
+      expires_at: couponForm.expires_at || null,
+    }).select().single();
+    setSavingCoupon(false);
+    if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
+    if (data) setCoupons(prev => [data, ...prev]);
+    setCouponForm(emptyCoupon);
+    setShowCouponForm(false);
+    toast({ title: "Coupon created!" });
+  };
+
   const totalRevenue = orders.reduce((sum, o) => sum + o.total, 0);
   const totalOrders = orders.length;
   const totalProducts = products.length;
