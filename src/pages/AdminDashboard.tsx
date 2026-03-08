@@ -6,8 +6,9 @@ import {
   LayoutDashboard, Package, ShoppingCart, Tag, Settings,
   Plus, Eye, Edit, Trash2, DollarSign,
   Globe, Image, Monitor, Save, Upload, X, Bell,
-  Receipt, Download, ExternalLink, Video
+  Receipt, Download, ExternalLink, Video, MessageCircle
 } from "lucide-react";
+import { AdminChatbotPanel } from "@/components/admin/AdminChatbotPanel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -54,6 +55,7 @@ const sidebarItems = [
   { id: "products", icon: Package, label: "Products" },
   { id: "orders", icon: ShoppingCart, label: "Orders" },
   { id: "coupons", icon: Tag, label: "Coupons" },
+  { id: "chatbot", icon: MessageCircle, label: "AI Chatbot" },
   { id: "banners", icon: Image, label: "Banners" },
   { id: "seo", icon: Globe, label: "SEO" },
   { id: "website", icon: Monitor, label: "Website" },
@@ -887,6 +889,9 @@ const AdminDashboard = () => {
               </div>
             </div>
           )}
+
+          {/* ======================== AI CHATBOT ======================== */}
+          {activeTab === "chatbot" && <AdminChatbotPanel />}
 
         </div>
       </div>
