@@ -5,7 +5,7 @@ import logoImg from "@/assets/logo.png";
 
 export function Footer() {
   return (
-    <footer className="bg-primary text-primary-foreground hidden md:block">
+    <footer className="bg-primary text-primary-foreground pb-20 md:pb-0">
       {/* Main footer */}
       <div className="container px-4 py-14">
         <div className="grid md:grid-cols-5 gap-10">
