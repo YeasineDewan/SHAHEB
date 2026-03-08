@@ -1,21 +1,18 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 import {
-  LayoutDashboard, Package, ShoppingCart, Users, Tag, BarChart3, MessageSquare, Settings,
-  Plus, Search, Eye, Edit, Trash2, DollarSign, TrendingUp, UserCheck, FileText,
-  Globe, Image, Megaphone, Receipt, Download, Mail, Bell, ShieldCheck, Palette,
-  Type, Link2, Monitor, Smartphone, Save, Upload, X, Check, ChevronRight,
-  Calendar, Clock, MapPin, CreditCard, Printer, GripVertical, ExternalLink, Copy
+  LayoutDashboard, Package, ShoppingCart, Tag, Settings,
+  Plus, Eye, Edit, Trash2, DollarSign,
+  Globe, Image, Monitor, Save, Upload, X, Bell,
+  Receipt, Download, ExternalLink, Video
 } from "lucide-react";
-import { ImageDropZone } from "@/components/ui/image-dropzone";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -28,6 +25,29 @@ import { toast } from "@/hooks/use-toast";
 import logoImg from "@/assets/logo.png";
 
 type OrderWithItems = Tables<"orders"> & { order_items: Tables<"order_items">[] };
+
+interface ProductFormData {
+  name: string;
+  category: string;
+  price: string;
+  originalPrice: string;
+  stock: string;
+  description: string;
+  slug: string;
+  sizes: string;
+  colors: string;
+  videoUrl: string;
+  imageFiles: File[];
+  imageUrls: string[]; // existing uploaded URLs
+}
+
+const createEmptyProductForm = (): ProductFormData => ({
+  name: "", category: "", price: "", originalPrice: "", stock: "",
+  description: "", slug: "", sizes: "", colors: "", videoUrl: "",
+  imageFiles: [], imageUrls: [],
+});
+
+const emptyCoupon = { code: "", discount_type: "percentage", discount_value: "", min_order_amount: "", max_uses: "", expires_at: "" };
 
 const sidebarItems = [
   { id: "overview", icon: LayoutDashboard, label: "Dashboard" },
@@ -60,13 +80,11 @@ function InvoicePreview({ invoice, onClose }: { invoice: { id: string; orderId: 
   return (
     <div className="fixed inset-0 z-50 bg-foreground/50 flex items-center justify-center p-4" onClick={onClose}>
       <div className="bg-background rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl" onClick={e => e.stopPropagation()}>
-        <div className="p-6 md:p-8" id="invoice-content">
+        <div className="p-6 md:p-8">
           <div className="flex items-start justify-between mb-8">
             <div>
               <img src={logoImg} alt="SHAHEB" className="h-8 w-auto mb-2" />
               <p className="text-xs text-muted-foreground">Premium Men's Fashion</p>
-              <p className="text-xs text-muted-foreground">Mumbai, Maharashtra, India</p>
-              <p className="text-xs text-muted-foreground">GSTIN: 27AABCS1234H1Z5</p>
             </div>
             <div className="text-right">
               <h2 className="text-lg font-bold">INVOICE</h2>
@@ -88,7 +106,7 @@ function InvoicePreview({ invoice, onClose }: { invoice: { id: string; orderId: 
           </div>
         </div>
         <div className="flex gap-3 p-6 pt-0">
-          <Button className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90 rounded-full gap-2" onClick={() => { toast({ title: "Invoice downloaded!" }); }}>
+          <Button className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90 rounded-full gap-2" onClick={() => toast({ title: "Invoice downloaded!" })}>
             <Download className="h-4 w-4" /> Download PDF
           </Button>
           <Button variant="ghost" size="icon" className="rounded-full" onClick={onClose}><X className="h-4 w-4" /></Button>
@@ -98,8 +116,80 @@ function InvoicePreview({ invoice, onClose }: { invoice: { id: string; orderId: 
   );
 }
 
-const emptyProduct = { name: "", category: "", price: "", originalPrice: "", stock: "", description: "", slug: "", images: "", sizes: "", colors: "" };
-const emptyCoupon = { code: "", discount_type: "percentage", discount_value: "", min_order_amount: "", max_uses: "", expires_at: "" };
+// Image Upload Component
+function ProductImageUploader({
+  imageFiles, imageUrls, onFilesChange, onRemoveFile, onRemoveUrl
+}: {
+  imageFiles: File[];
+  imageUrls: string[];
+  onFilesChange: (files: File[]) => void;
+  onRemoveFile: (idx: number) => void;
+  onRemoveUrl: (idx: number) => void;
+}) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const totalImages = imageUrls.length + imageFiles.length;
+
+  const handleFiles = (files: FileList | null) => {
+    if (!files) return;
+    const allowed = 5 - totalImages;
+    if (allowed <= 0) { toast({ title: "Max 5 images", variant: "destructive" }); return; }
+    const newFiles = Array.from(files).slice(0, allowed).filter(f => f.type.startsWith("image/") && f.size <= 5 * 1024 * 1024);
+    if (newFiles.length < files.length) toast({ title: "Some files skipped", description: "Max 5MB per image, images only." });
+    onFilesChange([...imageFiles, ...newFiles]);
+  };
+
+  return (
+    <div className="space-y-2">
+      <Label className="text-xs">Product Images (max 5)</Label>
+      <div className="flex flex-wrap gap-3">
+        {imageUrls.map((url, i) => (
+          <div key={`url-${i}`} className="relative w-20 h-24 rounded-lg overflow-hidden border border-border group">
+            <img src={url} alt="" className="w-full h-full object-cover" />
+            <button onClick={() => onRemoveUrl(i)} className="absolute top-1 right-1 w-5 h-5 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <X className="h-3 w-3" />
+            </button>
+          </div>
+        ))}
+        {imageFiles.map((file, i) => (
+          <div key={`file-${i}`} className="relative w-20 h-24 rounded-lg overflow-hidden border border-border group">
+            <img src={URL.createObjectURL(file)} alt="" className="w-full h-full object-cover" />
+            <button onClick={() => onRemoveFile(i)} className="absolute top-1 right-1 w-5 h-5 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+              <X className="h-3 w-3" />
+            </button>
+          </div>
+        ))}
+        {totalImages < 5 && (
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            onDragOver={e => { e.preventDefault(); e.currentTarget.classList.add("border-accent"); }}
+            onDragLeave={e => e.currentTarget.classList.remove("border-accent")}
+            onDrop={e => { e.preventDefault(); e.currentTarget.classList.remove("border-accent"); handleFiles(e.dataTransfer.files); }}
+            className="w-20 h-24 rounded-lg border-2 border-dashed border-border hover:border-accent transition-colors flex flex-col items-center justify-center gap-1 text-muted-foreground"
+          >
+            <Upload className="h-4 w-4" />
+            <span className="text-[10px]">Upload</span>
+          </button>
+        )}
+      </div>
+      <input ref={fileInputRef} type="file" accept="image/*" multiple className="hidden" onChange={e => handleFiles(e.target.files)} />
+      <p className="text-[10px] text-muted-foreground">{totalImages}/5 images · Drag & drop or click to upload · Max 5MB each</p>
+    </div>
+  );
+}
+
+// Upload images to storage and return URLs
+async function uploadProductImages(files: File[]): Promise<string[]> {
+  const urls: string[] = [];
+  for (const file of files) {
+    const ext = file.name.split(".").pop() || "jpg";
+    const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    const { error } = await supabase.storage.from("product-images").upload(path, file);
+    if (error) { console.error("Upload error:", error); continue; }
+    const { data: { publicUrl } } = supabase.storage.from("product-images").getPublicUrl(path);
+    urls.push(publicUrl);
+  }
+  return urls;
+}
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
@@ -107,16 +197,19 @@ const AdminDashboard = () => {
   const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
   const navigate = useNavigate();
 
-  // Real data state
   const [products, setProducts] = useState<Tables<"products">[]>([]);
   const [orders, setOrders] = useState<OrderWithItems[]>([]);
   const [coupons, setCoupons] = useState<Tables<"coupons">[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
 
-  // Form state
+  // Product form
   const [showProductForm, setShowProductForm] = useState(false);
-  const [productForm, setProductForm] = useState(emptyProduct);
+  const [productForm, setProductForm] = useState<ProductFormData>(createEmptyProductForm());
   const [savingProduct, setSavingProduct] = useState(false);
+  const [editingProductId, setEditingProductId] = useState<string | null>(null);
+
+  // Coupon form
   const [showCouponForm, setShowCouponForm] = useState(false);
   const [couponForm, setCouponForm] = useState(emptyCoupon);
   const [savingCoupon, setSavingCoupon] = useState(false);
@@ -124,13 +217,13 @@ const AdminDashboard = () => {
   useEffect(() => {
     const init = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { navigate("/login"); return; }
 
-      // Check admin role
-      const { data: roleData } = await supabase.rpc("has_role", { _user_id: user.id, _role: "admin" });
-      if (!roleData) { navigate("/"); toast({ title: "Access denied", description: "Admin privileges required.", variant: "destructive" }); return; }
+      if (user) {
+        const { data: roleData } = await supabase.rpc("has_role", { _user_id: user.id, _role: "admin" });
+        if (roleData) setIsAdmin(true);
+      }
 
-      // Fetch all data in parallel
+      // Fetch data (products are public, orders/coupons need admin)
       const [prodRes, ordRes, coupRes] = await Promise.all([
         supabase.from("products").select("*").order("created_at", { ascending: false }),
         supabase.from("orders").select("*, order_items(*)").order("created_at", { ascending: false }),
@@ -143,7 +236,7 @@ const AdminDashboard = () => {
       setLoading(false);
     };
     init();
-  }, [navigate]);
+  }, []);
 
   const handleDeleteProduct = async (id: string) => {
     const { error } = await supabase.from("products").delete().eq("id", id);
@@ -179,12 +272,20 @@ const AdminDashboard = () => {
     toast({ title: "Coupon deleted" });
   };
 
-  const handleCreateProduct = async () => {
+  const handleSaveProduct = async () => {
     if (!productForm.name.trim() || !productForm.category.trim() || !productForm.price || !productForm.slug.trim()) {
       toast({ title: "Missing fields", description: "Name, category, price and slug are required.", variant: "destructive" }); return;
     }
     setSavingProduct(true);
-    const { data, error } = await supabase.from("products").insert({
+
+    // Upload new image files
+    let uploadedUrls: string[] = [];
+    if (productForm.imageFiles.length > 0) {
+      uploadedUrls = await uploadProductImages(productForm.imageFiles);
+    }
+    const allImages = [...productForm.imageUrls, ...uploadedUrls];
+
+    const productData = {
       name: productForm.name.trim(),
       category: productForm.category.trim(),
       price: parseInt(productForm.price),
@@ -192,16 +293,50 @@ const AdminDashboard = () => {
       stock: productForm.stock ? parseInt(productForm.stock) : 0,
       description: productForm.description.trim() || null,
       slug: productForm.slug.trim().toLowerCase().replace(/\s+/g, "-"),
-      images: productForm.images ? productForm.images.split(",").map(s => s.trim()).filter(Boolean) : [],
+      images: allImages,
       sizes: productForm.sizes ? productForm.sizes.split(",").map(s => s.trim()).filter(Boolean) : [],
       colors: productForm.colors ? productForm.colors.split(",").map(s => s.trim()).filter(Boolean) : [],
-    }).select().single();
-    setSavingProduct(false);
-    if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
-    if (data) setProducts(prev => [data, ...prev]);
-    setProductForm(emptyProduct);
+      video_url: productForm.videoUrl.trim() || null,
+    };
+
+    if (editingProductId) {
+      // Update existing
+      const { data, error } = await supabase.from("products").update(productData).eq("id", editingProductId).select().single();
+      setSavingProduct(false);
+      if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
+      if (data) setProducts(prev => prev.map(p => p.id === editingProductId ? data : p));
+      toast({ title: "Product updated!" });
+    } else {
+      // Create new
+      const { data, error } = await supabase.from("products").insert(productData).select().single();
+      setSavingProduct(false);
+      if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
+      if (data) setProducts(prev => [data, ...prev]);
+      toast({ title: "Product created!" });
+    }
+
+    setProductForm(createEmptyProductForm());
     setShowProductForm(false);
-    toast({ title: "Product created!" });
+    setEditingProductId(null);
+  };
+
+  const handleEditProduct = (p: Tables<"products">) => {
+    setEditingProductId(p.id);
+    setProductForm({
+      name: p.name,
+      category: p.category,
+      price: p.price.toString(),
+      originalPrice: p.original_price?.toString() || "",
+      stock: (p.stock ?? 0).toString(),
+      description: p.description || "",
+      slug: p.slug,
+      sizes: (p.sizes || []).join(", "),
+      colors: (p.colors || []).join(", "),
+      videoUrl: (p as any).video_url || "",
+      imageFiles: [],
+      imageUrls: p.images || [],
+    });
+    setShowProductForm(true);
   };
 
   const handleCreateCoupon = async () => {
@@ -226,28 +361,21 @@ const AdminDashboard = () => {
   };
 
   const totalRevenue = orders.reduce((sum, o) => sum + o.total, 0);
-  const totalOrders = orders.length;
-  const totalProducts = products.length;
 
   return (
     <div className="min-h-screen bg-background flex">
       {/* Sidebar */}
       <aside className="hidden md:flex w-60 border-r border-border bg-card flex-col shrink-0 sticky top-0 h-screen">
         <div className="p-5 border-b border-border">
-          <Link to="/">
-            <img src={logoImg} alt="SHAHEB" className="h-7 w-auto mb-0.5" />
-          </Link>
+          <Link to="/"><img src={logoImg} alt="SHAHEB" className="h-7 w-auto mb-0.5" /></Link>
           <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Admin Panel</p>
         </div>
         <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
           {sidebarItems.map(item => (
-            <button
-              key={item.id}
-              onClick={() => setActiveTab(item.id)}
+            <button key={item.id} onClick={() => setActiveTab(item.id)}
               className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm transition-colors ${
                 activeTab === item.id ? "bg-accent text-accent-foreground font-medium" : "text-muted-foreground hover:bg-secondary"
-              }`}
-            >
+              }`}>
               <item.icon className="h-4 w-4" /> {item.label}
             </button>
           ))}
@@ -259,14 +387,13 @@ const AdminDashboard = () => {
         </div>
       </aside>
 
-      {/* Mobile sidebar toggle */}
+      {/* Mobile sidebar */}
       <div className="md:hidden fixed top-0 left-0 right-0 z-20 bg-background border-b border-border h-14 flex items-center px-4 gap-3">
         <Button variant="ghost" size="icon" onClick={() => setMobileSidebar(!mobileSidebar)}>
           {mobileSidebar ? <X className="h-5 w-5" /> : <LayoutDashboard className="h-5 w-5" />}
         </Button>
         <span className="font-semibold text-sm capitalize">{activeTab === "overview" ? "Dashboard" : activeTab}</span>
       </div>
-
       {mobileSidebar && (
         <div className="md:hidden fixed inset-0 z-30">
           <div className="absolute inset-0 bg-foreground/50" onClick={() => setMobileSidebar(false)} />
@@ -304,14 +431,15 @@ const AdminDashboard = () => {
         </header>
 
         <div className="p-4 md:p-6 mt-14 md:mt-0">
+
           {/* ======================== OVERVIEW ======================== */}
           {activeTab === "overview" && (
             <div className="space-y-6">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[
                   { label: "Revenue", value: `₹${totalRevenue.toLocaleString()}`, icon: DollarSign, color: "text-green-600" },
-                  { label: "Orders", value: totalOrders.toString(), icon: ShoppingCart, color: "text-blue-600" },
-                  { label: "Products", value: totalProducts.toString(), icon: Package, color: "text-accent" },
+                  { label: "Orders", value: orders.length.toString(), icon: ShoppingCart, color: "text-blue-600" },
+                  { label: "Products", value: products.length.toString(), icon: Package, color: "text-accent" },
                   { label: "Coupons", value: coupons.length.toString(), icon: Tag, color: "text-purple-600" },
                 ].map(stat => (
                   <div key={stat.label} className="bg-card border border-border rounded-xl p-5">
@@ -325,7 +453,6 @@ const AdminDashboard = () => {
                   </div>
                 ))}
               </div>
-
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="bg-card border border-border rounded-xl">
                   <div className="px-5 py-3 border-b border-border flex items-center justify-between">
@@ -347,12 +474,9 @@ const AdminDashboard = () => {
                         </div>
                       </div>
                     ))}
-                    {orders.length === 0 && !loading && (
-                      <p className="text-sm text-muted-foreground text-center py-6">No orders yet</p>
-                    )}
+                    {orders.length === 0 && !loading && <p className="text-sm text-muted-foreground text-center py-6">No orders yet</p>}
                   </div>
                 </div>
-
                 <div className="bg-card border border-border rounded-xl">
                   <div className="px-5 py-3 border-b border-border flex items-center justify-between">
                     <h3 className="font-semibold text-sm">Low Stock Products</h3>
@@ -384,18 +508,32 @@ const AdminDashboard = () => {
             <div>
               <div className="flex items-center justify-between mb-6">
                 <h2 className="font-bold text-lg">Products ({products.length})</h2>
-                <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full text-xs gap-1" onClick={() => setShowProductForm(!showProductForm)}>
+                <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full text-xs gap-1" onClick={() => {
+                  setEditingProductId(null);
+                  setProductForm(createEmptyProductForm());
+                  setShowProductForm(!showProductForm);
+                }}>
                   <Plus className="h-3.5 w-3.5" /> Add Product
                 </Button>
               </div>
 
-              {/* Add Product Form */}
+              {/* Product Form (Create / Edit) */}
               {showProductForm && (
-                <div className="bg-card border border-border rounded-xl p-6 mb-6 space-y-4">
+                <div className="bg-card border border-border rounded-xl p-6 mb-6 space-y-5">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-semibold text-sm">New Product</h3>
-                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setShowProductForm(false)}><X className="h-4 w-4" /></Button>
+                    <h3 className="font-semibold text-sm">{editingProductId ? "Edit Product" : "New Product"}</h3>
+                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => { setShowProductForm(false); setEditingProductId(null); }}><X className="h-4 w-4" /></Button>
                   </div>
+
+                  {/* Image Upload */}
+                  <ProductImageUploader
+                    imageFiles={productForm.imageFiles}
+                    imageUrls={productForm.imageUrls}
+                    onFilesChange={(files) => setProductForm(f => ({ ...f, imageFiles: files }))}
+                    onRemoveFile={(idx) => setProductForm(f => ({ ...f, imageFiles: f.imageFiles.filter((_, i) => i !== idx) }))}
+                    onRemoveUrl={(idx) => setProductForm(f => ({ ...f, imageUrls: f.imageUrls.filter((_, i) => i !== idx) }))}
+                  />
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label className="text-xs">Name *</Label>
@@ -421,10 +559,6 @@ const AdminDashboard = () => {
                       <Label className="text-xs">Stock</Label>
                       <Input type="number" placeholder="50" value={productForm.stock} onChange={e => setProductForm(f => ({ ...f, stock: e.target.value }))} />
                     </div>
-                    <div className="space-y-2 md:col-span-2">
-                      <Label className="text-xs">Image URLs (comma separated)</Label>
-                      <Input placeholder="https://example.com/img1.jpg, https://example.com/img2.jpg" value={productForm.images} onChange={e => setProductForm(f => ({ ...f, images: e.target.value }))} />
-                    </div>
                     <div className="space-y-2">
                       <Label className="text-xs">Sizes (comma separated)</Label>
                       <Input placeholder="S, M, L, XL" value={productForm.sizes} onChange={e => setProductForm(f => ({ ...f, sizes: e.target.value }))} />
@@ -434,12 +568,16 @@ const AdminDashboard = () => {
                       <Input placeholder="White, Blue, Black" value={productForm.colors} onChange={e => setProductForm(f => ({ ...f, colors: e.target.value }))} />
                     </div>
                     <div className="space-y-2 md:col-span-2">
+                      <Label className="text-xs flex items-center gap-1"><Video className="h-3 w-3" /> Video URL (YouTube / Vimeo)</Label>
+                      <Input placeholder="https://youtube.com/watch?v=..." value={productForm.videoUrl} onChange={e => setProductForm(f => ({ ...f, videoUrl: e.target.value }))} />
+                    </div>
+                    <div className="space-y-2 md:col-span-2">
                       <Label className="text-xs">Description</Label>
                       <Textarea placeholder="Product description..." value={productForm.description} onChange={e => setProductForm(f => ({ ...f, description: e.target.value }))} className="h-20" />
                     </div>
                   </div>
-                  <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full text-xs gap-1" onClick={handleCreateProduct} disabled={savingProduct}>
-                    <Save className="h-3.5 w-3.5" /> {savingProduct ? "Saving..." : "Save Product"}
+                  <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full text-xs gap-1" onClick={handleSaveProduct} disabled={savingProduct}>
+                    <Save className="h-3.5 w-3.5" /> {savingProduct ? "Saving..." : editingProductId ? "Update Product" : "Save Product"}
                   </Button>
                 </div>
               )}
@@ -466,7 +604,10 @@ const AdminDashboard = () => {
                             ) : (
                               <div className="w-10 h-12 rounded-lg bg-secondary flex items-center justify-center"><Package className="h-4 w-4 text-muted-foreground" /></div>
                             )}
-                            <span className="font-medium">{p.name}</span>
+                            <div>
+                              <span className="font-medium text-sm">{p.name}</span>
+                              {(p as any).video_url && <Video className="h-3 w-3 text-muted-foreground inline ml-1.5" />}
+                            </div>
                           </div>
                         </TableCell>
                         <TableCell className="text-muted-foreground">{p.category}</TableCell>
@@ -475,6 +616,9 @@ const AdminDashboard = () => {
                         <TableCell><Badge variant={p.is_active ? "default" : "secondary"}>{p.is_active ? "Active" : "Inactive"}</Badge></TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-1">
+                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleEditProduct(p)}>
+                              <Edit className="h-3.5 w-3.5" />
+                            </Button>
                             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => handleToggleProduct(p.id, !!p.is_active)}>
                               {p.is_active ? <Eye className="h-3.5 w-3.5" /> : <X className="h-3.5 w-3.5" />}
                             </Button>
@@ -532,9 +676,7 @@ const AdminDashboard = () => {
                         <TableCell className="font-bold">₹{o.total.toLocaleString()}</TableCell>
                         <TableCell>
                           <Select value={o.status} onValueChange={(val) => handleUpdateOrderStatus(o.id, val)}>
-                            <SelectTrigger className="h-7 w-28 text-xs rounded-full">
-                              <SelectValue />
-                            </SelectTrigger>
+                            <SelectTrigger className="h-7 w-28 text-xs rounded-full"><SelectValue /></SelectTrigger>
                             <SelectContent>
                               <SelectItem value="pending">Pending</SelectItem>
                               <SelectItem value="processing">Processing</SelectItem>
@@ -551,8 +693,7 @@ const AdminDashboard = () => {
                               id: `INV-${(o.order_number || o.id.slice(0, 8))}`,
                               orderId: o.order_number || o.id.slice(0, 8),
                               customer: o.shipping_name || "Customer",
-                              amount: o.total,
-                              tax,
+                              amount: o.total, tax,
                               date: new Date(o.created_at).toLocaleDateString("en-IN", { year: "numeric", month: "short", day: "numeric" }),
                               status: o.payment_status === "paid" ? "Paid" : "Pending",
                             });
@@ -580,8 +721,6 @@ const AdminDashboard = () => {
                   <Plus className="h-3.5 w-3.5" /> Create Coupon
                 </Button>
               </div>
-
-              {/* Add Coupon Form */}
               {showCouponForm && (
                 <div className="bg-card border border-border rounded-xl p-6 mb-6 space-y-4">
                   <div className="flex items-center justify-between">
@@ -625,7 +764,6 @@ const AdminDashboard = () => {
                   </Button>
                 </div>
               )}
-
               <div className="bg-card border border-border rounded-xl overflow-hidden">
                 <Table>
                   <TableHeader>
@@ -680,11 +818,7 @@ const AdminDashboard = () => {
                   <h2 className="font-bold text-lg">Banner Management</h2>
                   <p className="text-xs text-muted-foreground mt-0.5">Manage hero sliders, promo banners and category images</p>
                 </div>
-                <div className="flex gap-2">
-                  <Badge variant="outline" className="text-[10px]">{mockBanners.length} banners</Badge>
-                </div>
               </div>
-
               <div className="grid md:grid-cols-2 gap-4">
                 {mockBanners.map(b => (
                   <div key={b.id} className="bg-card border border-border rounded-xl overflow-hidden group hover:shadow-md transition-shadow">
@@ -699,8 +833,7 @@ const AdminDashboard = () => {
                     </div>
                     <div className="p-4 space-y-3">
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <ExternalLink className="h-3 w-3" />
-                        <span className="truncate">{b.link}</span>
+                        <ExternalLink className="h-3 w-3" /><span className="truncate">{b.link}</span>
                       </div>
                       <Separator />
                       <div className="flex gap-2">
@@ -714,48 +847,28 @@ const AdminDashboard = () => {
             </div>
           )}
 
-          {/* ======================== SEO & MARKETING ======================== */}
+          {/* ======================== SEO ======================== */}
           {activeTab === "seo" && (
             <div className="space-y-6 max-w-3xl">
-              <div>
-                <h2 className="font-bold text-lg">SEO & Marketing</h2>
-                <p className="text-xs text-muted-foreground mt-0.5">Optimize your store for search engines</p>
-              </div>
+              <h2 className="font-bold text-lg">SEO & Marketing</h2>
               <div className="bg-card border border-border rounded-xl p-6 space-y-5">
-                <div className="space-y-2">
-                  <Label className="text-xs">Site Title</Label>
-                  <Input defaultValue="SHAHEB — Premium Men's Fashion & Digital Products" />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-xs">Meta Description</Label>
-                  <Textarea defaultValue="Shop premium men's clothing, ethnic wear, jackets & digital style guides at SHAHEB. Free shipping on orders above ₹999." className="h-20" />
-                </div>
-                <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full text-xs gap-1" onClick={() => toast({ title: "SEO settings saved!" })}><Save className="h-3.5 w-3.5" /> Save SEO Settings</Button>
+                <div className="space-y-2"><Label className="text-xs">Site Title</Label><Input defaultValue="SHAHEB — Premium Men's Fashion & Digital Products" /></div>
+                <div className="space-y-2"><Label className="text-xs">Meta Description</Label><Textarea defaultValue="Shop premium men's clothing at SHAHEB." className="h-20" /></div>
+                <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full text-xs gap-1" onClick={() => toast({ title: "SEO settings saved!" })}><Save className="h-3.5 w-3.5" /> Save</Button>
               </div>
             </div>
           )}
 
-          {/* ======================== WEBSITE SETTINGS ======================== */}
+          {/* ======================== WEBSITE ======================== */}
           {activeTab === "website" && (
             <div className="space-y-6 max-w-3xl">
               <h2 className="font-bold text-lg">Website Settings</h2>
               <div className="bg-card border border-border rounded-xl p-6 space-y-4">
-                <h3 className="font-semibold text-sm">Store Information</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2"><Label className="text-xs">Store Name</Label><Input defaultValue="SHAHEB" /></div>
                   <div className="space-y-2"><Label className="text-xs">Store Email</Label><Input defaultValue="support@shaheb.com" /></div>
-                  <div className="space-y-2"><Label className="text-xs">Store Phone</Label><Input defaultValue="+91 98765 43210" /></div>
-                  <div className="space-y-2"><Label className="text-xs">Currency</Label>
-                    <Select defaultValue="inr">
-                      <SelectTrigger className="h-10"><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="inr">INR (₹)</SelectItem>
-                        <SelectItem value="usd">USD ($)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
                 </div>
-                <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full text-xs gap-1" onClick={() => toast({ title: "Settings saved!" })}><Save className="h-3.5 w-3.5" /> Save Changes</Button>
+                <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full text-xs gap-1" onClick={() => toast({ title: "Settings saved!" })}><Save className="h-3.5 w-3.5" /> Save</Button>
               </div>
             </div>
           )}
@@ -765,27 +878,19 @@ const AdminDashboard = () => {
             <div className="space-y-6 max-w-2xl">
               <h2 className="font-bold text-lg">Store Settings</h2>
               <div className="bg-card border border-border rounded-xl p-6 space-y-4">
-                <h3 className="font-semibold text-sm">Shipping Settings</h3>
+                <h3 className="font-semibold text-sm">Shipping</h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2"><Label className="text-xs">Free Shipping Threshold</Label><Input defaultValue="999" type="number" /></div>
-                  <div className="space-y-2"><Label className="text-xs">Express Shipping Fee</Label><Input defaultValue="149" type="number" /></div>
+                  <div className="space-y-2"><Label className="text-xs">Express Fee</Label><Input defaultValue="149" type="number" /></div>
                 </div>
-                <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full text-xs gap-1"><Save className="h-3.5 w-3.5" /> Save Shipping</Button>
-              </div>
-              <div className="bg-card border border-border rounded-xl p-6 space-y-4">
-                <h3 className="font-semibold text-sm">Tax Settings</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2"><Label className="text-xs">GST %</Label><Input defaultValue="18" type="number" /></div>
-                </div>
-                <div className="flex items-center justify-between"><span className="text-sm">Show tax in product prices</span><Switch defaultChecked /></div>
-                <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full text-xs gap-1"><Save className="h-3.5 w-3.5" /> Save Tax</Button>
+                <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full text-xs gap-1"><Save className="h-3.5 w-3.5" /> Save</Button>
               </div>
             </div>
           )}
+
         </div>
       </div>
 
-      {/* Modals */}
       {selectedInvoice && <InvoicePreview invoice={selectedInvoice} onClose={() => setSelectedInvoice(null)} />}
     </div>
   );
