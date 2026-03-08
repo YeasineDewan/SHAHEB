@@ -55,6 +55,7 @@ const sidebarItems = [
   { id: "products", icon: Package, label: "Products" },
   { id: "orders", icon: ShoppingCart, label: "Orders" },
   { id: "coupons", icon: Tag, label: "Coupons" },
+  { id: "chatbot", icon: MessageCircle, label: "AI Chatbot" },
   { id: "banners", icon: Image, label: "Banners" },
   { id: "seo", icon: Globe, label: "SEO" },
   { id: "website", icon: Monitor, label: "Website" },
