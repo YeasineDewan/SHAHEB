@@ -20,6 +20,7 @@ import type { Tables } from "@/integrations/supabase/types";
 
 const ProductDetail = () => {
   const { id } = useParams();
+  const { addItem } = useCart();
   const [product, setProduct] = useState<Tables<"products"> | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<Tables<"products">[]>([]);
   const [loading, setLoading] = useState(true);
