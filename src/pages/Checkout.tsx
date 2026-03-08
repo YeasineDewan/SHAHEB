@@ -39,7 +39,10 @@ const Checkout = () => {
 
   const placeOrder = () => {
     setOrderPlaced(true);
-    toast({ title: "Order placed successfully! 🎉" });
+    toast({
+      title: "🎉 Order Placed Successfully!",
+      description: "Your order ORD-2026-004 has been confirmed. You'll receive a confirmation email shortly.",
+    });
   };
 
   if (orderPlaced) {

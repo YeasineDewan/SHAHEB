@@ -1,8 +1,7 @@
 import { Link } from "react-router-dom";
 import { Instagram, Twitter, Facebook, Youtube, Mail, MapPin, Phone } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import logoImg from "@/assets/logo.png";
 
 export function Footer() {
   return (
@@ -12,7 +11,9 @@ export function Footer() {
         <div className="grid md:grid-cols-5 gap-10">
           {/* Brand */}
           <div className="md:col-span-2">
-            <h3 className="font-display text-2xl font-bold tracking-[0.3em] mb-4">SHAHEB</h3>
+            <Link to="/">
+              <img src={logoImg} alt="SHAHEB" className="h-10 w-auto brightness-0 invert mb-4" />
+            </Link>
             <p className="text-sm text-primary-foreground/60 leading-relaxed mb-6 max-w-xs">
               Premium men's fashion & digital content. Curated for the modern gentleman who values quality and style.
             </p>
@@ -30,10 +31,10 @@ export function Footer() {
             <h4 className="font-semibold text-xs tracking-[0.2em] uppercase mb-5 text-primary-foreground/80">Shop</h4>
             <ul className="space-y-3 text-sm text-primary-foreground/50">
               <li><Link to="/products" className="hover:text-primary-foreground transition-colors">All Products</Link></li>
-              <li><Link to="/products?category=shirts" className="hover:text-primary-foreground transition-colors">Shirts</Link></li>
-              <li><Link to="/products?category=ethnic" className="hover:text-primary-foreground transition-colors">Ethnic Wear</Link></li>
-              <li><Link to="/products?category=jackets" className="hover:text-primary-foreground transition-colors">Jackets & Blazers</Link></li>
-              <li><Link to="/products?category=digital" className="hover:text-primary-foreground transition-colors">Digital Products</Link></li>
+              <li><Link to="/category/shirts" className="hover:text-primary-foreground transition-colors">Shirts</Link></li>
+              <li><Link to="/category/ethnic" className="hover:text-primary-foreground transition-colors">Ethnic Wear</Link></li>
+              <li><Link to="/category/jackets" className="hover:text-primary-foreground transition-colors">Jackets & Blazers</Link></li>
+              <li><Link to="/category/digital" className="hover:text-primary-foreground transition-colors">Digital Products</Link></li>
             </ul>
           </div>
 
@@ -43,7 +44,7 @@ export function Footer() {
             <ul className="space-y-3 text-sm text-primary-foreground/50">
               <li><Link to="/contact" className="hover:text-primary-foreground transition-colors">Contact Us</Link></li>
               <li><Link to="/faq" className="hover:text-primary-foreground transition-colors">FAQ</Link></li>
-              <li><Link to="/orders" className="hover:text-primary-foreground transition-colors">Track Order</Link></li>
+              <li><Link to="/track-order" className="hover:text-primary-foreground transition-colors">Track Order</Link></li>
               <li><Link to="/about" className="hover:text-primary-foreground transition-colors">About Us</Link></li>
             </ul>
           </div>

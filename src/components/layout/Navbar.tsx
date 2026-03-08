@@ -6,6 +6,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
+import logoImg from "@/assets/logo.png";
 
 const announcements = [
   "Free Shipping on Orders Above ₹999",
@@ -74,8 +75,8 @@ export function Navbar() {
             <Button variant="ghost" size="icon" className="text-primary-foreground hover:bg-primary-foreground/10" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
               {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
-            <Link to="/" className="font-display text-xl font-bold tracking-[0.25em]">
-              SHAHEB
+            <Link to="/" className="flex items-center">
+              <img src={logoImg} alt="SHAHEB" className="h-8 w-auto brightness-0 invert" />
             </Link>
             <div className="flex items-center gap-0.5">
               <Button variant="ghost" size="icon" className="text-primary-foreground hover:bg-primary-foreground/10 h-9 w-9" asChild>
@@ -146,8 +147,8 @@ export function Navbar() {
       {/* Main nav */}
       <div className="bg-primary text-primary-foreground">
         <div className="container flex items-center justify-between h-14">
-          <Link to="/" className="font-display text-2xl font-bold tracking-[0.3em]">
-            SHAHEB
+          <Link to="/" className="flex items-center">
+            <img src={logoImg} alt="SHAHEB" className="h-9 w-auto brightness-0 invert" />
           </Link>
 
           <nav className="hidden md:flex items-center gap-7">
