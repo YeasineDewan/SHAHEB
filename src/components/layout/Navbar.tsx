@@ -174,7 +174,7 @@ export function Navbar() {
             <Button variant="ghost" size="icon" className="text-primary-foreground hover:bg-primary-foreground/10 relative" asChild>
               <Link to="/cart">
                 <ShoppingBag className="h-4 w-4" />
-                <span className="absolute top-1 right-1 w-4 h-4 bg-accent text-accent-foreground text-[9px] font-bold rounded-full flex items-center justify-center">0</span>
+                {itemCount > 0 && <span className="absolute top-1 right-1 w-4 h-4 bg-accent text-accent-foreground text-[9px] font-bold rounded-full flex items-center justify-center">{itemCount}</span>}
               </Link>
             </Button>
             <Button variant="ghost" size="sm" className="text-primary-foreground hover:bg-primary-foreground/10 text-xs tracking-wider uppercase ml-1" asChild>
