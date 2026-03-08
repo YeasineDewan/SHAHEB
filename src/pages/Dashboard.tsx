@@ -64,7 +64,7 @@ const statusColor: Record<string, string> = {
 };
 
 // Invoice popup
-function InvoiceModal({ order, onClose }: { order: typeof recentOrders[0]; onClose: () => void }) {
+function InvoiceModal({ order, onClose }: { order: Order; onClose: () => void }) {
   const subtotal = order.items.reduce((s, i) => s + i.price * i.qty, 0);
   const tax = Math.round(subtotal * 0.18);
   const total = subtotal + tax;
