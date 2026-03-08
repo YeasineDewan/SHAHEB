@@ -384,10 +384,66 @@ const AdminDashboard = () => {
             <div>
               <div className="flex items-center justify-between mb-6">
                 <h2 className="font-bold text-lg">Products ({products.length})</h2>
-                <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full text-xs gap-1" asChild>
-                  <Link to="/products"><Plus className="h-3.5 w-3.5" /> Add Product</Link>
+                <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full text-xs gap-1" onClick={() => setShowProductForm(!showProductForm)}>
+                  <Plus className="h-3.5 w-3.5" /> Add Product
                 </Button>
               </div>
+
+              {/* Add Product Form */}
+              {showProductForm && (
+                <div className="bg-card border border-border rounded-xl p-6 mb-6 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-semibold text-sm">New Product</h3>
+                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setShowProductForm(false)}><X className="h-4 w-4" /></Button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-xs">Name *</Label>
+                      <Input placeholder="Classic Oxford Shirt" value={productForm.name} onChange={e => setProductForm(f => ({ ...f, name: e.target.value }))} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Slug *</Label>
+                      <Input placeholder="classic-oxford-shirt" value={productForm.slug} onChange={e => setProductForm(f => ({ ...f, slug: e.target.value }))} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Category *</Label>
+                      <Input placeholder="shirts" value={productForm.category} onChange={e => setProductForm(f => ({ ...f, category: e.target.value }))} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Price (₹) *</Label>
+                      <Input type="number" placeholder="2499" value={productForm.price} onChange={e => setProductForm(f => ({ ...f, price: e.target.value }))} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Original Price (₹)</Label>
+                      <Input type="number" placeholder="3499" value={productForm.originalPrice} onChange={e => setProductForm(f => ({ ...f, originalPrice: e.target.value }))} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Stock</Label>
+                      <Input type="number" placeholder="50" value={productForm.stock} onChange={e => setProductForm(f => ({ ...f, stock: e.target.value }))} />
+                    </div>
+                    <div className="space-y-2 md:col-span-2">
+                      <Label className="text-xs">Image URLs (comma separated)</Label>
+                      <Input placeholder="https://example.com/img1.jpg, https://example.com/img2.jpg" value={productForm.images} onChange={e => setProductForm(f => ({ ...f, images: e.target.value }))} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Sizes (comma separated)</Label>
+                      <Input placeholder="S, M, L, XL" value={productForm.sizes} onChange={e => setProductForm(f => ({ ...f, sizes: e.target.value }))} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Colors (comma separated)</Label>
+                      <Input placeholder="White, Blue, Black" value={productForm.colors} onChange={e => setProductForm(f => ({ ...f, colors: e.target.value }))} />
+                    </div>
+                    <div className="space-y-2 md:col-span-2">
+                      <Label className="text-xs">Description</Label>
+                      <Textarea placeholder="Product description..." value={productForm.description} onChange={e => setProductForm(f => ({ ...f, description: e.target.value }))} className="h-20" />
+                    </div>
+                  </div>
+                  <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full text-xs gap-1" onClick={handleCreateProduct} disabled={savingProduct}>
+                    <Save className="h-3.5 w-3.5" /> {savingProduct ? "Saving..." : "Save Product"}
+                  </Button>
+                </div>
+              )}
+
               <div className="bg-card border border-border rounded-xl overflow-hidden">
                 <Table>
                   <TableHeader>
