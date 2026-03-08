@@ -200,6 +200,7 @@ export type Database = {
           stock: number | null
           subcategory: string | null
           updated_at: string
+          video_url: string | null
         }
         Insert: {
           category: string
@@ -221,6 +222,7 @@ export type Database = {
           stock?: number | null
           subcategory?: string | null
           updated_at?: string
+          video_url?: string | null
         }
         Update: {
           category?: string
@@ -242,6 +244,7 @@ export type Database = {
           stock?: number | null
           subcategory?: string | null
           updated_at?: string
+          video_url?: string | null
         }
         Relationships: []
       }
