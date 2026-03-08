@@ -576,7 +576,56 @@ const AdminDashboard = () => {
             <div>
               <div className="flex items-center justify-between mb-6">
                 <h2 className="font-bold text-lg">Coupons ({coupons.length})</h2>
+                <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full text-xs gap-1" onClick={() => setShowCouponForm(!showCouponForm)}>
+                  <Plus className="h-3.5 w-3.5" /> Create Coupon
+                </Button>
               </div>
+
+              {/* Add Coupon Form */}
+              {showCouponForm && (
+                <div className="bg-card border border-border rounded-xl p-6 mb-6 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-semibold text-sm">New Coupon</h3>
+                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setShowCouponForm(false)}><X className="h-4 w-4" /></Button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label className="text-xs">Code *</Label>
+                      <Input placeholder="SUMMER20" value={couponForm.code} onChange={e => setCouponForm(f => ({ ...f, code: e.target.value }))} className="font-mono uppercase" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Discount Type</Label>
+                      <Select value={couponForm.discount_type} onValueChange={val => setCouponForm(f => ({ ...f, discount_type: val }))}>
+                        <SelectTrigger className="h-10"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="percentage">Percentage (%)</SelectItem>
+                          <SelectItem value="flat">Flat (₹)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Discount Value *</Label>
+                      <Input type="number" placeholder={couponForm.discount_type === "percentage" ? "20" : "500"} value={couponForm.discount_value} onChange={e => setCouponForm(f => ({ ...f, discount_value: e.target.value }))} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Min Order Amount (₹)</Label>
+                      <Input type="number" placeholder="999" value={couponForm.min_order_amount} onChange={e => setCouponForm(f => ({ ...f, min_order_amount: e.target.value }))} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Max Uses</Label>
+                      <Input type="number" placeholder="500" value={couponForm.max_uses} onChange={e => setCouponForm(f => ({ ...f, max_uses: e.target.value }))} />
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">Expiry Date</Label>
+                      <Input type="datetime-local" value={couponForm.expires_at} onChange={e => setCouponForm(f => ({ ...f, expires_at: e.target.value }))} />
+                    </div>
+                  </div>
+                  <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full text-xs gap-1" onClick={handleCreateCoupon} disabled={savingCoupon}>
+                    <Save className="h-3.5 w-3.5" /> {savingCoupon ? "Saving..." : "Save Coupon"}
+                  </Button>
+                </div>
+              )}
+
               <div className="bg-card border border-border rounded-xl overflow-hidden">
                 <Table>
                   <TableHeader>
