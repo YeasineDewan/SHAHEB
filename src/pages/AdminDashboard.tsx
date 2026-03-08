@@ -6,8 +6,9 @@ import {
   LayoutDashboard, Package, ShoppingCart, Tag, Settings,
   Plus, Eye, Edit, Trash2, DollarSign,
   Globe, Image, Monitor, Save, Upload, X, Bell,
-  Receipt, Download, ExternalLink, Video
+  Receipt, Download, ExternalLink, Video, MessageCircle
 } from "lucide-react";
+import { AdminChatbotPanel } from "@/components/admin/AdminChatbotPanel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
