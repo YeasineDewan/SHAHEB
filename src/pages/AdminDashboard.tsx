@@ -143,7 +143,7 @@ function InvoicePreview({ invoice, onClose }: { invoice: typeof mockInvoices[0];
 }
 
 // Customer profile modal
-function CustomerProfile({ user, onClose }: { user: typeof mockUsers[0]; onClose: () => void }) {
+function CustomerProfile({ user, onClose }: { user: { id: number; name: string; email: string; phone: string; orders: number; spent: number; status: string; joined: string; lastLogin: string }; onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 bg-foreground/50 flex items-center justify-center p-4" onClick={onClose}>
       <div className="bg-background rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl" onClick={e => e.stopPropagation()}>
