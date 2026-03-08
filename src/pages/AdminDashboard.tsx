@@ -1024,8 +1024,14 @@ const AdminDashboard = () => {
                   <div className="bg-card border border-border rounded-xl p-6 space-y-4">
                     <h3 className="font-semibold text-sm">Branding</h3>
                     <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2"><Label className="text-xs">Logo URL</Label><Input defaultValue="/assets/logo.png" /></div>
-                      <div className="space-y-2"><Label className="text-xs">Favicon URL</Label><Input defaultValue="/favicon.ico" /></div>
+                      <div className="space-y-2">
+                        <Label className="text-xs">Logo</Label>
+                        <ImageDropZone aspectRatio="aspect-[3/1]" placeholder="Drop your logo here" maxSizeMB={2} />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-xs">Favicon</Label>
+                        <ImageDropZone aspectRatio="aspect-square" placeholder="Drop favicon" maxSizeMB={1} />
+                      </div>
                     </div>
                     <div className="space-y-2"><Label className="text-xs">Footer Copyright Text</Label><Input defaultValue="© 2026 SHAHEB. All rights reserved." /></div>
                   </div>
