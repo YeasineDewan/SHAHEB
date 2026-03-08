@@ -935,7 +935,10 @@ const AdminDashboard = () => {
                     <h3 className="font-semibold text-sm">Open Graph (Facebook/LinkedIn)</h3>
                     <div className="space-y-2"><Label className="text-xs">OG Title</Label><Input defaultValue="SHAHEB — Premium Men's Fashion" /></div>
                     <div className="space-y-2"><Label className="text-xs">OG Description</Label><Textarea defaultValue="Shop premium men's fashion at SHAHEB" className="h-16" /></div>
-                    <div className="space-y-2"><Label className="text-xs">OG Image URL</Label><Input placeholder="https://shaheb.com/og-image.jpg" /></div>
+                    <div className="space-y-2">
+                      <Label className="text-xs">OG Image</Label>
+                      <ImageDropZone aspectRatio="aspect-video" placeholder="Drop OG image (1200×630px recommended)" maxSizeMB={2} />
+                    </div>
                   </div>
                   <div className="bg-card border border-border rounded-xl p-6 space-y-4">
                     <h3 className="font-semibold text-sm">Twitter Card</h3>
