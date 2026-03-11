@@ -1,18 +1,81 @@
 import { useState, useEffect, useRef } from "react";
-import { MessageCircle, X, Send, Loader2, Minimize2, Sparkles } from "lucide-react";
+import { MessageCircle, X, Send, Loader2, Minimize2, Sparkles, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import ReactMarkdown from "react-markdown";
 import { motion, AnimatePresence } from "framer-motion";
+import { Link } from "react-router-dom";
+import { useCart } from "@/contexts/CartContext";
+import { toast } from "@/hooks/use-toast";
 
 type Msg = { role: "user" | "assistant"; content: string };
+interface ProductData {
+  id: string; name: string; slug: string; price: number;
+  original_price: number | null; images: string[] | null; category: string;
+}
 
 function getSessionId() {
   let id = localStorage.getItem("shaheb_session_id");
   if (!id) { id = crypto.randomUUID(); localStorage.setItem("shaheb_session_id", id); }
   return id;
+}
+
+function ProductCard({ product }: { product: ProductData }) {
+  const { addItem } = useCart();
+  const discount = product.original_price ? Math.round((1 - product.price / product.original_price) * 100) : 0;
+  const image = product.images?.[0] || "/placeholder.svg";
+
+  const handleAdd = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addItem({
+      product_id: product.id, name: product.name, price: product.price,
+      original_price: product.original_price, image, size: "", color: "",
+      quantity: 1, is_digital: false, slug: product.slug,
+    });
+    toast({ title: "কার্টে যোগ হয়েছে!", description: product.name });
+  };
+
+  return (
+    <div className="flex gap-2.5 bg-card border border-border rounded-xl p-2.5 my-2 hover:shadow-sm transition-shadow">
+      <Link to={`/products/${product.slug}`} className="w-16 h-20 rounded-lg overflow-hidden bg-secondary shrink-0">
+        <img src={image} alt={product.name} className="w-full h-full object-cover" />
+      </Link>
+      <div className="flex-1 min-w-0">
+        <Link to={`/products/${product.slug}`} className="text-xs font-semibold line-clamp-1 hover:text-accent transition-colors">{product.name}</Link>
+        <p className="text-[10px] text-muted-foreground capitalize mt-0.5">{product.category}</p>
+        <div className="flex items-center gap-1.5 mt-1">
+          <span className="text-accent font-bold text-xs">৳{product.price.toLocaleString()}</span>
+          {product.original_price && <span className="text-[10px] text-muted-foreground line-through">৳{product.original_price.toLocaleString()}</span>}
+          {discount > 0 && <span className="text-[9px] bg-destructive text-destructive-foreground px-1 py-0.5 rounded">-{discount}%</span>}
+        </div>
+        <Button size="sm" className="h-6 text-[10px] rounded-full bg-accent text-accent-foreground hover:bg-accent/90 mt-1.5 px-3" onClick={handleAdd}>
+          <ShoppingBag className="h-3 w-3 mr-1" /> কার্টে যোগ করুন
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function ChatMessageContent({ content, products }: { content: string; products: ProductData[] }) {
+  // Split content by [product:slug] pattern
+  const parts = content.split(/\[product:([^\]]+)\]/g);
+
+  return (
+    <div className="prose prose-sm dark:prose-invert max-w-none [&>p]:my-1 [&>ul]:my-1 [&>h2]:text-sm [&>h3]:text-sm">
+      {parts.map((part, i) => {
+        if (i % 2 === 1) {
+          const product = products.find(p => p.slug === part.trim());
+          if (product) return <ProductCard key={i} product={product} />;
+          return null;
+        }
+        if (!part.trim()) return null;
+        return <ReactMarkdown key={i}>{part}</ReactMarkdown>;
+      })}
+    </div>
+  );
 }
 
 export function AIChatWidget() {
@@ -21,33 +84,36 @@ export function AIChatWidget() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
-  const [welcomeMessage, setWelcomeMessage] = useState("Hi! How can I help you today?");
-  const [botName, setBotName] = useState("SHAHEB Assistant");
+  const [welcomeMessage, setWelcomeMessage] = useState("আসসালামু আলাইকুম! আমি আপনাকে কিভাবে সাহায্য করতে পারি?");
+  const [botName, setBotName] = useState("SHAHEB সহকারী");
   const [enabled, setEnabled] = useState(true);
+  const [products, setProducts] = useState<ProductData[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Load config
+  // Load config + products
   useEffect(() => {
-    const loadConfig = async () => {
-      const { data } = await supabase.from("ai_chat_config" as any).select("key, value");
-      if (data) {
+    const load = async () => {
+      const [configRes, prodRes] = await Promise.all([
+        supabase.from("ai_chat_config" as any).select("key, value"),
+        supabase.from("products").select("id, name, slug, price, original_price, images, category").eq("is_active", true).limit(50),
+      ]);
+      if (configRes.data) {
         const cfg: Record<string, string> = {};
-        (data as any[]).forEach(r => { cfg[r.key] = r.value; });
+        (configRes.data as any[]).forEach(r => { cfg[r.key] = r.value; });
         if (cfg.welcome_message) setWelcomeMessage(cfg.welcome_message);
         if (cfg.bot_name) setBotName(cfg.bot_name);
         if (cfg.is_enabled === "false") setEnabled(false);
       }
+      if (prodRes.data) setProducts(prodRes.data);
     };
-    loadConfig();
+    load();
   }, []);
 
-  // Auto-scroll
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [messages, open]);
 
-  // Create conversation on first open
   const ensureConversation = async () => {
     if (conversationId) return conversationId;
     const { data: session } = await supabase.auth.getSession();
@@ -64,7 +130,6 @@ export function AIChatWidget() {
     const text = input.trim();
     if (!text || loading) return;
     setInput("");
-
     const userMsg: Msg = { role: "user", content: text };
     setMessages(prev => [...prev, userMsg]);
     setLoading(true);
@@ -99,13 +164,13 @@ export function AIChatWidget() {
       });
 
       if (!resp.ok) {
-        const err = await resp.json().catch(() => ({ error: "Something went wrong" }));
-        upsertAssistant(err.error || "Sorry, I couldn't process that. Please try again.");
+        const err = await resp.json().catch(() => ({ error: "কিছু ভুল হয়েছে" }));
+        upsertAssistant(err.error || "দুঃখিত, প্রক্রিয়া করতে পারিনি। আবার চেষ্টা করুন।");
         setLoading(false);
         return;
       }
 
-      if (!resp.body) { upsertAssistant("Sorry, something went wrong."); setLoading(false); return; }
+      if (!resp.body) { upsertAssistant("দুঃখিত, কিছু ভুল হয়েছে।"); setLoading(false); return; }
 
       const reader = resp.body.getReader();
       const decoder = new TextDecoder();
@@ -131,7 +196,7 @@ export function AIChatWidget() {
         }
       }
     } catch {
-      upsertAssistant("Sorry, I'm having trouble connecting. Please try again later.");
+      upsertAssistant("দুঃখিত, সংযোগে সমস্যা হচ্ছে। পরে আবার চেষ্টা করুন।");
     }
     setLoading(false);
   };
@@ -139,21 +204,18 @@ export function AIChatWidget() {
   if (!enabled) return null;
 
   const quickQuestions = [
-    "What's your shipping policy?",
-    "How do I track my order?",
-    "What sizes do you offer?",
-    "Do you accept returns?",
+    "আপনাদের শিপিং নীতি কী?",
+    "আমার অর্ডার কিভাবে ট্র্যাক করব?",
+    "কোন সাইজগুলো পাওয়া যায়?",
+    "রিটার্ন কি সম্ভব?",
   ];
 
   return (
     <>
-      {/* Chat bubble */}
       <AnimatePresence>
         {!open && (
           <motion.button
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0, opacity: 0 }}
+            initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }}
             onClick={() => setOpen(true)}
             className="fixed bottom-20 md:bottom-6 right-4 md:right-6 z-50 w-14 h-14 rounded-full bg-accent text-accent-foreground shadow-lg shadow-accent/30 flex items-center justify-center hover:scale-105 transition-transform"
           >
@@ -162,14 +224,11 @@ export function AIChatWidget() {
         )}
       </AnimatePresence>
 
-      {/* Chat window */}
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            transition={{ duration: 0.2 }}
+            initial={{ opacity: 0, y: 20, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }} transition={{ duration: 0.2 }}
             className="fixed bottom-20 md:bottom-6 right-4 md:right-6 z-50 w-[calc(100vw-2rem)] md:w-[400px] h-[500px] md:h-[560px] bg-background border border-border rounded-2xl shadow-2xl flex flex-col overflow-hidden"
           >
             {/* Header */}
@@ -180,7 +239,7 @@ export function AIChatWidget() {
                 </div>
                 <div>
                   <p className="font-semibold text-sm">{botName}</p>
-                  <p className="text-[10px] opacity-80">Powered by AI</p>
+                  <p className="text-[10px] opacity-80">AI চালিত</p>
                 </div>
               </div>
               <div className="flex items-center gap-1">
@@ -195,7 +254,6 @@ export function AIChatWidget() {
 
             {/* Messages */}
             <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-3">
-              {/* Welcome */}
               <div className="flex gap-2">
                 <div className="w-7 h-7 rounded-full bg-accent/10 flex items-center justify-center shrink-0 mt-0.5">
                   <Sparkles className="h-3.5 w-3.5 text-accent" />
@@ -205,15 +263,11 @@ export function AIChatWidget() {
                 </div>
               </div>
 
-              {/* Quick questions if no messages */}
               {messages.length === 0 && (
                 <div className="flex flex-wrap gap-1.5 pl-9">
                   {quickQuestions.map(q => (
-                    <button
-                      key={q}
-                      onClick={() => { setInput(q); setTimeout(() => { setInput(q); }, 0); }}
-                      className="text-[11px] px-3 py-1.5 rounded-full border border-border bg-card hover:border-accent/50 hover:bg-accent/5 transition-colors text-muted-foreground"
-                    >
+                    <button key={q} onClick={() => { setInput(q); setTimeout(() => { setInput(q); }, 0); }}
+                      className="text-[11px] px-3 py-1.5 rounded-full border border-border bg-card hover:border-accent/50 hover:bg-accent/5 transition-colors text-muted-foreground">
                       {q}
                     </button>
                   ))}
@@ -229,14 +283,10 @@ export function AIChatWidget() {
                   )}
                   <div className={cn(
                     "rounded-2xl px-3.5 py-2.5 max-w-[85%] text-sm",
-                    msg.role === "user"
-                      ? "bg-accent text-accent-foreground rounded-tr-md"
-                      : "bg-secondary rounded-tl-md"
+                    msg.role === "user" ? "bg-accent text-accent-foreground rounded-tr-md" : "bg-secondary rounded-tl-md"
                   )}>
                     {msg.role === "assistant" ? (
-                      <div className="prose prose-sm dark:prose-invert max-w-none [&>p]:my-1 [&>ul]:my-1 [&>h2]:text-sm [&>h3]:text-sm">
-                        <ReactMarkdown>{msg.content}</ReactMarkdown>
-                      </div>
+                      <ChatMessageContent content={msg.content} products={products} />
                     ) : (
                       <p>{msg.content}</p>
                     )}
@@ -263,24 +313,14 @@ export function AIChatWidget() {
             {/* Input */}
             <div className="p-3 border-t border-border shrink-0">
               <form onSubmit={e => { e.preventDefault(); handleSend(); }} className="flex gap-2">
-                <Input
-                  ref={inputRef}
-                  value={input}
-                  onChange={e => setInput(e.target.value)}
-                  placeholder="Type your message..."
-                  className="rounded-full text-sm h-10"
-                  disabled={loading}
-                />
-                <Button
-                  type="submit"
-                  size="icon"
-                  disabled={!input.trim() || loading}
-                  className="h-10 w-10 rounded-full bg-accent text-accent-foreground hover:bg-accent/90 shrink-0"
-                >
+                <Input ref={inputRef} value={input} onChange={e => setInput(e.target.value)}
+                  placeholder="আপনার বার্তা লিখুন..." className="rounded-full text-sm h-10" disabled={loading} />
+                <Button type="submit" size="icon" disabled={!input.trim() || loading}
+                  className="h-10 w-10 rounded-full bg-accent text-accent-foreground hover:bg-accent/90 shrink-0">
                   {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                 </Button>
               </form>
-              <p className="text-[9px] text-muted-foreground text-center mt-1.5">AI-powered · Responses may not always be accurate</p>
+              <p className="text-[9px] text-muted-foreground text-center mt-1.5">AI চালিত · উত্তর সবসময় সঠিক নাও হতে পারে</p>
             </div>
           </motion.div>
         )}
