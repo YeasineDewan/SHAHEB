@@ -28,7 +28,7 @@ serve(async (req) => {
     (configRows || []).forEach((r: any) => { config[r.key] = r.value; });
 
     if (config.is_enabled === "false") {
-      return new Response(JSON.stringify({ error: "Chat is currently disabled" }), {
+      return new Response(JSON.stringify({ error: "চ্যাট বর্তমানে বন্ধ আছে" }), {
         status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -43,19 +43,43 @@ serve(async (req) => {
       .map((k: any) => `## ${k.title} (${k.category})\n${k.content}`)
       .join("\n\n");
 
-    const systemPrompt = `${config.system_prompt || "You are a helpful assistant."}
+    // Fetch product catalog for recommendations
+    const { data: productRows } = await supabase
+      .from("products")
+      .select("name, slug, price, original_price, category, images, description")
+      .eq("is_active", true)
+      .order("created_at", { ascending: false })
+      .limit(50);
 
---- KNOWLEDGE BASE ---
-Use the following information to answer customer questions accurately:
+    const productCatalog = (productRows || [])
+      .map((p: any) => `- ${p.name} | slug:${p.slug} | ৳${p.price} | category:${p.category} | image:${p.images?.[0] || ''} | ${p.description?.slice(0, 80) || ''}`)
+      .join("\n");
+
+    const systemPrompt = `${config.system_prompt || "আপনি SHAHEB এর একজন সহায়ক সহকারী। সবসময় বাংলায় উত্তর দিন।"}
+
+--- জ্ঞানভান্ডার ---
+নিচের তথ্য ব্যবহার করে গ্রাহকদের প্রশ্নের সঠিক উত্তর দিন:
 
 ${knowledgeContext}
 
---- INSTRUCTIONS ---
-- Answer based on the knowledge base when relevant
-- Be concise and friendly
-- Use markdown formatting for readability
-- If you don't know something, suggest contacting support
-- Never make up order statuses or tracking information`;
+--- পণ্য তালিকা ---
+গ্রাহককে পণ্য সুপারিশ করতে, নিচের ফরম্যাটে পণ্য দেখান:
+[product:SLUG_NAME]
+
+উদাহরণ: "এই শার্টটি আপনার জন্য দারুণ হবে: [product:classic-oxford-shirt]"
+
+উপলব্ধ পণ্য:
+${productCatalog}
+
+--- নির্দেশনা ---
+- সবসময় বাংলায় উত্তর দিন
+- জ্ঞানভান্ডারের তথ্য অনুযায়ী উত্তর দিন
+- সংক্ষিপ্ত ও বন্ধুত্বপূর্ণ থাকুন
+- পণ্য সুপারিশ করার সময় অবশ্যই [product:slug] ফরম্যাট ব্যবহার করুন
+- প্রাসঙ্গিক হলে একাধিক পণ্য সুপারিশ করুন
+- মার্কডাউন ফরম্যাটিং ব্যবহার করুন
+- অর্ডার স্ট্যাটাস বা ট্র্যাকিং তথ্য বানিয়ে বলবেন না
+- না জানলে সাপোর্টে যোগাযোগ করতে বলুন`;
 
     // Save user message to DB if conversation exists
     if (conversation_id && messages.length > 0) {
@@ -79,7 +103,7 @@ ${knowledgeContext}
         model: "google/gemini-3-flash-preview",
         messages: [
           { role: "system", content: systemPrompt },
-          ...messages.slice(-20), // Last 20 messages for context window
+          ...messages.slice(-20),
         ],
         stream: true,
       }),
@@ -87,24 +111,22 @@ ${knowledgeContext}
 
     if (!response.ok) {
       if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "I'm a bit busy right now. Please try again in a moment!" }), {
+        return new Response(JSON.stringify({ error: "এই মুহূর্তে ব্যস্ত আছি। দয়া করে কিছুক্ষণ পর আবার চেষ্টা করুন!" }), {
           status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "Service temporarily unavailable. Please try again later." }), {
+        return new Response(JSON.stringify({ error: "সেবা সাময়িকভাবে অনুপলব্ধ। দয়া করে পরে আবার চেষ্টা করুন।" }), {
           status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       const t = await response.text();
       console.error("AI gateway error:", response.status, t);
-      return new Response(JSON.stringify({ error: "AI service unavailable" }), {
+      return new Response(JSON.stringify({ error: "AI সেবা অনুপলব্ধ" }), {
         status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // We need to both stream to client AND capture full response for DB storage
-    // Use TransformStream to intercept the response
     const { readable, writable } = new TransformStream();
     const writer = writable.getWriter();
     const reader = response.body!.getReader();
@@ -116,8 +138,6 @@ ${knowledgeContext}
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
-          
-          // Parse SSE to capture content
           const text = decoder.decode(value, { stream: true });
           const lines = text.split("\n");
           for (const line of lines) {
@@ -129,11 +149,8 @@ ${knowledgeContext}
               } catch {}
             }
           }
-          
           await writer.write(value);
         }
-        
-        // Save assistant response to DB
         if (conversation_id && fullContent) {
           await supabase.from("chat_messages").insert({
             conversation_id,

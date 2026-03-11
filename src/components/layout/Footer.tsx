@@ -6,16 +6,12 @@ import logoImg from "@/assets/logo.png";
 export function Footer() {
   return (
     <footer className="bg-primary text-primary-foreground pb-20 md:pb-0">
-      {/* Main footer */}
       <div className="container px-4 py-14">
         <div className="grid md:grid-cols-5 gap-10">
-          {/* Brand */}
           <div className="md:col-span-2">
-            <Link to="/">
-              <img src={logoImg} alt="SHAHEB" className="h-10 w-auto brightness-0 invert mb-4" />
-            </Link>
+            <Link to="/"><img src={logoImg} alt="SHAHEB" className="h-10 w-auto brightness-0 invert mb-4" /></Link>
             <p className="text-sm text-primary-foreground/60 leading-relaxed mb-6 max-w-xs">
-              Premium men's fashion & digital content. Curated for the modern gentleman who values quality and style.
+              প্রিমিয়াম পুরুষদের ফ্যাশন ও ডিজিটাল কন্টেন্ট। আধুনিক ভদ্রলোকদের জন্য মানসম্পন্ন ও স্টাইলিশ পণ্য।
             </p>
             <div className="flex gap-3">
               {[Instagram, Twitter, Facebook, Youtube].map((Icon, i) => (
@@ -25,52 +21,42 @@ export function Footer() {
               ))}
             </div>
           </div>
-
-          {/* Quick Links */}
           <div>
-            <h4 className="font-semibold text-xs tracking-[0.2em] uppercase mb-5 text-primary-foreground/80">Shop</h4>
+            <h4 className="font-semibold text-xs tracking-[0.2em] uppercase mb-5 text-primary-foreground/80">কেনাকাটা</h4>
             <ul className="space-y-3 text-sm text-primary-foreground/50">
-              <li><Link to="/products" className="hover:text-primary-foreground transition-colors">All Products</Link></li>
-              <li><Link to="/category/shirts" className="hover:text-primary-foreground transition-colors">Shirts</Link></li>
-              <li><Link to="/category/ethnic" className="hover:text-primary-foreground transition-colors">Ethnic Wear</Link></li>
-              <li><Link to="/category/jackets" className="hover:text-primary-foreground transition-colors">Jackets & Blazers</Link></li>
-              <li><Link to="/category/digital" className="hover:text-primary-foreground transition-colors">Digital Products</Link></li>
+              <li><Link to="/products" className="hover:text-primary-foreground transition-colors">সকল পণ্য</Link></li>
+              <li><Link to="/category/shirts" className="hover:text-primary-foreground transition-colors">শার্ট</Link></li>
+              <li><Link to="/category/ethnic" className="hover:text-primary-foreground transition-colors">এথনিক পোশাক</Link></li>
+              <li><Link to="/category/jackets" className="hover:text-primary-foreground transition-colors">জ্যাকেট ও ব্লেজার</Link></li>
+              <li><Link to="/category/digital" className="hover:text-primary-foreground transition-colors">ডিজিটাল পণ্য</Link></li>
             </ul>
           </div>
-
-          {/* Support */}
           <div>
-            <h4 className="font-semibold text-xs tracking-[0.2em] uppercase mb-5 text-primary-foreground/80">Help</h4>
+            <h4 className="font-semibold text-xs tracking-[0.2em] uppercase mb-5 text-primary-foreground/80">সাহায্য</h4>
             <ul className="space-y-3 text-sm text-primary-foreground/50">
-              <li><Link to="/contact" className="hover:text-primary-foreground transition-colors">Contact Us</Link></li>
-              <li><Link to="/faq" className="hover:text-primary-foreground transition-colors">FAQ</Link></li>
-              <li><Link to="/track-order" className="hover:text-primary-foreground transition-colors">Track Order</Link></li>
-              <li><Link to="/about" className="hover:text-primary-foreground transition-colors">About Us</Link></li>
+              <li><Link to="/contact" className="hover:text-primary-foreground transition-colors">যোগাযোগ</Link></li>
+              <li><Link to="/faq" className="hover:text-primary-foreground transition-colors">সাধারণ জিজ্ঞাসা</Link></li>
+              <li><Link to="/track-order" className="hover:text-primary-foreground transition-colors">অর্ডার ট্র্যাক</Link></li>
+              <li><Link to="/about" className="hover:text-primary-foreground transition-colors">আমাদের সম্পর্কে</Link></li>
             </ul>
           </div>
-
-          {/* Contact info */}
           <div>
-            <h4 className="font-semibold text-xs tracking-[0.2em] uppercase mb-5 text-primary-foreground/80">Contact</h4>
+            <h4 className="font-semibold text-xs tracking-[0.2em] uppercase mb-5 text-primary-foreground/80">যোগাযোগ</h4>
             <ul className="space-y-3 text-sm text-primary-foreground/50">
               <li className="flex items-start gap-2"><Mail className="h-4 w-4 mt-0.5 shrink-0" /> support@shaheb.com</li>
-              <li className="flex items-start gap-2"><Phone className="h-4 w-4 mt-0.5 shrink-0" /> +91 98765 43210</li>
-              <li className="flex items-start gap-2"><MapPin className="h-4 w-4 mt-0.5 shrink-0" /> Mumbai, Maharashtra, India</li>
+              <li className="flex items-start gap-2"><Phone className="h-4 w-4 mt-0.5 shrink-0" /> +৮৮০ ১৭১২ ৩৪৫৬৭৮</li>
+              <li className="flex items-start gap-2"><MapPin className="h-4 w-4 mt-0.5 shrink-0" /> ঢাকা, বাংলাদেশ</li>
             </ul>
           </div>
         </div>
       </div>
-
-      {/* Bottom bar */}
       <div className="border-t border-primary-foreground/10">
         <div className="container px-4 py-5 flex flex-col md:flex-row items-center justify-between gap-3">
-          <p className="text-xs text-primary-foreground/40">
-            © {new Date().getFullYear()} SHAHEB. All rights reserved.
-          </p>
+          <p className="text-xs text-primary-foreground/40">© {new Date().getFullYear()} SHAHEB। সর্বস্বত্ব সংরক্ষিত।</p>
           <div className="flex items-center gap-6 text-xs text-primary-foreground/40">
-            <Link to="/privacy" className="hover:text-primary-foreground/70 transition-colors">Privacy Policy</Link>
-            <Link to="/terms" className="hover:text-primary-foreground/70 transition-colors">Terms & Conditions</Link>
-            <Link to="/returns" className="hover:text-primary-foreground/70 transition-colors">Refund Policy</Link>
+            <Link to="/privacy" className="hover:text-primary-foreground/70 transition-colors">গোপনীয়তা নীতি</Link>
+            <Link to="/terms" className="hover:text-primary-foreground/70 transition-colors">শর্তাবলী</Link>
+            <Link to="/returns" className="hover:text-primary-foreground/70 transition-colors">রিফান্ড নীতি</Link>
           </div>
         </div>
       </div>
