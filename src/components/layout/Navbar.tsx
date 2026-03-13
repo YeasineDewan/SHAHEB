@@ -1,46 +1,55 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, ShoppingBag, User, Search, Heart, ChevronDown } from "lucide-react";
+import { Menu, X, ShoppingBag, User, Search, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { LanguageToggle } from "@/components/LanguageToggle";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useCart } from "@/contexts/CartContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import logoImg from "@/assets/logo.png";
 
-const announcements = [
-  "৳৯৯৯+ অর্ডারে বিনামূল্যে শিপিং",
-  "🔥 গ্রীষ্মকালীন কালেকশন ২০২৬ — এখন লাইভ!",
-  "কোড SHAHEB20 ব্যবহার করে প্রথম অর্ডারে ২০% ছাড়",
-  "প্রতি শুক্রবার নতুন পণ্য — সাথে থাকুন!",
-  "💎 প্রিমিয়াম সদস্যরা আগে অ্যাক্সেস পান",
-];
+export function Navbar() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const isMobile = useIsMobile();
+  const location = useLocation();
+  const { itemCount } = useCart();
+  const { t } = useLanguage();
 
-const navLinks = [
-  { label: "হোম", href: "/" },
-  { label: "পণ্যসমূহ", href: "/products" },
-  { label: "আমাদের সম্পর্কে", href: "/about" },
-  { label: "যোগাযোগ", href: "/contact" },
-  { label: "জিজ্ঞাসা", href: "/faq" },
-];
+  const announcements = [
+    t("announce.free_shipping"),
+    t("announce.summer"),
+    t("announce.discount"),
+    t("announce.friday"),
+    t("announce.premium"),
+  ];
 
-const categoryLinks = [
-  { label: "শার্ট", href: "/category/shirts" },
-  { label: "ট্রাউজার্স", href: "/category/trousers" },
-  { label: "এথনিক পোশাক", href: "/category/ethnic" },
-  { label: "জ্যাকেট ও ব্লেজার", href: "/category/jackets" },
-  { label: "এক্সেসরিজ", href: "/category/accessories" },
-  { label: "ডিজিটাল পণ্য", href: "/category/digital" },
-];
+  const navLinks = [
+    { label: t("nav.home"), href: "/" },
+    { label: t("nav.products"), href: "/products" },
+    { label: t("nav.about"), href: "/about" },
+    { label: t("nav.contact"), href: "/contact" },
+    { label: t("nav.faq"), href: "/faq" },
+  ];
 
-function AnnouncementSlider() {
+  const categoryLinks = [
+    { label: t("cat.shirts"), href: "/category/shirts" },
+    { label: t("cat.trousers"), href: "/category/trousers" },
+    { label: t("cat.ethnic"), href: "/category/ethnic" },
+    { label: t("cat.jackets"), href: "/category/jackets" },
+    { label: t("cat.accessories"), href: "/category/accessories" },
+    { label: t("cat.digital"), href: "/category/digital" },
+  ];
+
   const [current, setCurrent] = useState(0);
   useEffect(() => {
     const timer = setInterval(() => setCurrent((c) => (c + 1) % announcements.length), 3500);
     return () => clearInterval(timer);
-  }, []);
-  return (
+  }, [announcements.length]);
+
+  const AnnouncementBar = () => (
     <div className="bg-accent text-accent-foreground py-1.5 overflow-hidden relative h-7">
       <AnimatePresence mode="wait">
         <motion.p key={current} initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -20, opacity: 0 }} transition={{ duration: 0.3 }}
@@ -50,19 +59,12 @@ function AnnouncementSlider() {
       </AnimatePresence>
     </div>
   );
-}
-
-export function Navbar() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const isMobile = useIsMobile();
-  const location = useLocation();
-  const { itemCount } = useCart();
 
   if (isMobile) {
     return (
       <>
         <header className="fixed top-0 left-0 right-0 z-50 bg-primary text-primary-foreground">
-          <AnnouncementSlider />
+          <AnnouncementBar />
           <div className="flex items-center justify-between px-4 h-13">
             <Button variant="ghost" size="icon" className="text-primary-foreground hover:bg-primary-foreground/10" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
               {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -101,7 +103,7 @@ export function Navbar() {
                   {link.label}
                 </Link>
               ))}
-              <div className="pt-2 pb-1"><p className="text-[10px] text-primary-foreground/40 uppercase tracking-widest">ক্যাটেগরি</p></div>
+              <div className="pt-2 pb-1"><p className="text-[10px] text-primary-foreground/40 uppercase tracking-widest">{t("nav.category")}</p></div>
               {categoryLinks.map((link) => (
                 <Link key={link.href} to={link.href} onClick={() => setMobileMenuOpen(false)}
                   className="block py-2.5 text-sm text-primary-foreground/70 hover:text-primary-foreground transition-colors">
@@ -110,11 +112,12 @@ export function Navbar() {
               ))}
               <div className="flex items-center gap-3 pt-4 border-t border-primary-foreground/10">
                 <ThemeToggle />
+                <LanguageToggle />
                 <Button variant="outline" size="sm" className="border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10 rounded-full text-xs" asChild>
-                  <Link to="/login" onClick={() => setMobileMenuOpen(false)}>লগইন</Link>
+                  <Link to="/login" onClick={() => setMobileMenuOpen(false)}>{t("nav.login")}</Link>
                 </Button>
                 <Button variant="outline" size="sm" className="border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10 rounded-full text-xs" asChild>
-                  <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)}>ড্যাশবোর্ড</Link>
+                  <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)}>{t("nav.dashboard")}</Link>
                 </Button>
               </div>
             </nav>
@@ -126,7 +129,7 @@ export function Navbar() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
-      <AnnouncementSlider />
+      <AnnouncementBar />
       <div className="bg-primary text-primary-foreground">
         <div className="container flex items-center justify-between h-14">
           <Link to="/" className="flex items-center"><img src={logoImg} alt="SHAHEB" className="h-9 w-auto brightness-0 invert" /></Link>
@@ -140,6 +143,7 @@ export function Navbar() {
             ))}
           </nav>
           <div className="flex items-center gap-1">
+            <LanguageToggle />
             <ThemeToggle />
             <Button variant="ghost" size="icon" className="text-primary-foreground hover:bg-primary-foreground/10" asChild>
               <Link to="/search"><Search className="h-4 w-4" /></Link>
@@ -154,7 +158,7 @@ export function Navbar() {
               </Link>
             </Button>
             <Button variant="ghost" size="sm" className="text-primary-foreground hover:bg-primary-foreground/10 text-xs tracking-wider uppercase ml-1" asChild>
-              <Link to="/login"><User className="h-4 w-4 mr-1.5" /> লগইন</Link>
+              <Link to="/login"><User className="h-4 w-4 mr-1.5" /> {t("nav.login")}</Link>
             </Button>
           </div>
         </div>
