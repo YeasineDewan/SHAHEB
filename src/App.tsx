@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { CartProvider } from "./contexts/CartContext";
+import { LanguageProvider } from "./contexts/LanguageContext";
 import { AIChatWidget } from "./components/AIChatWidget";
 import Index from "./pages/Index";
 import Products from "./pages/Products";
@@ -30,6 +31,7 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+    <LanguageProvider>
     <CartProvider>
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -63,6 +65,7 @@ const App = () => (
       </TooltipProvider>
     </QueryClientProvider>
     </CartProvider>
+    </LanguageProvider>
   </ThemeProvider>
 );
 

@@ -11,10 +11,12 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "@/hooks/use-toast";
 import { useCart } from "@/contexts/CartContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 
 const Cart = () => {
   const { items, removeItem, updateQuantity, subtotal } = useCart();
+  const { t } = useLanguage();
   const [coupon, setCoupon] = useState("");
   const [couponApplied, setCouponApplied] = useState(false);
   const [couponDiscount, setCouponDiscount] = useState(0);
@@ -36,19 +38,19 @@ const Cart = () => {
       .maybeSingle();
 
     if (!data || error) {
-      toast({ title: "Invalid coupon code", variant: "destructive" });
+      toast({ title: t("cart.invalidCoupon"), variant: "destructive" });
       setValidatingCoupon(false);
       return;
     }
 
     if (data.min_order_amount && subtotal < data.min_order_amount) {
-      toast({ title: `Minimum order ₹${data.min_order_amount} required`, variant: "destructive" });
+      toast({ title: `${t("cart.minOrder")} ৳${data.min_order_amount}`, variant: "destructive" });
       setValidatingCoupon(false);
       return;
     }
 
     if (data.max_uses && (data.used_count ?? 0) >= data.max_uses) {
-      toast({ title: "Coupon usage limit reached", variant: "destructive" });
+      toast({ title: t("cart.invalidCoupon"), variant: "destructive" });
       setValidatingCoupon(false);
       return;
     }
@@ -59,7 +61,7 @@ const Cart = () => {
 
     setCouponDiscount(discountAmount);
     setCouponApplied(true);
-    toast({ title: "Coupon applied!", description: `₹${discountAmount.toLocaleString()} discount` });
+    toast({ title: t("cart.couponApplied"), description: `৳${discountAmount.toLocaleString()} ${t("cart.discount")}` });
     setValidatingCoupon(false);
   };
 
@@ -70,10 +72,10 @@ const Cart = () => {
           <div className="w-20 h-20 rounded-full bg-secondary flex items-center justify-center mx-auto mb-6">
             <ShoppingBag className="h-10 w-10 text-muted-foreground/40" />
           </div>
-          <h1 className="text-2xl font-bold mb-2">Your cart is empty</h1>
-          <p className="text-muted-foreground mb-6 max-w-sm mx-auto">Looks like you haven't added anything yet. Start exploring our collection!</p>
+          <h1 className="text-2xl font-bold mb-2">{t("cart.empty")}</h1>
+          <p className="text-muted-foreground mb-6 max-w-sm mx-auto">{t("cart.emptyDesc")}</p>
           <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full px-8 h-11" asChild>
-            <Link to="/products">Continue Shopping <ArrowRight className="ml-2 h-4 w-4" /></Link>
+            <Link to="/products">{t("products.continueShopping")} <ArrowRight className="ml-2 h-4 w-4" /></Link>
           </Button>
         </div>
         <Footer />
@@ -85,8 +87,8 @@ const Cart = () => {
     <Layout>
       <div className="bg-secondary/50 border-b border-border">
         <div className="container px-4 py-5">
-          <h1 className="text-2xl md:text-3xl font-bold">Shopping Cart</h1>
-          <p className="text-sm text-muted-foreground mt-1">{items.length} items · {items.reduce((s, i) => s + i.quantity, 0)} total</p>
+          <h1 className="text-2xl md:text-3xl font-bold">{t("cart.title")}</h1>
+          <p className="text-sm text-muted-foreground mt-1">{items.length} {t("cart.items")} · {items.reduce((s, i) => s + i.quantity, 0)} {t("cart.total")}</p>
         </div>
       </div>
 
@@ -94,15 +96,15 @@ const Cart = () => {
         {subtotal < 999 && (
           <div className="bg-accent/5 border border-accent/20 rounded-xl p-4 mb-6">
             <div className="flex items-center justify-between text-sm mb-2">
-              <span className="flex items-center gap-1.5"><Truck className="h-4 w-4 text-accent" /> Add ₹{(999 - subtotal).toLocaleString()} more for free shipping</span>
-              <span className="text-xs text-muted-foreground">₹999 min</span>
+              <span className="flex items-center gap-1.5"><Truck className="h-4 w-4 text-accent" /> {t("cart.addMore")} ৳{(999 - subtotal).toLocaleString()}</span>
+              <span className="text-xs text-muted-foreground">৳999</span>
             </div>
             <Progress value={freeShippingProgress} className="h-2" />
           </div>
         )}
         {subtotal >= 999 && (
           <div className="bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-800 rounded-xl p-3 mb-6 flex items-center gap-2 text-sm text-green-700 dark:text-green-400">
-            <Check className="h-4 w-4" /> You qualify for <strong>free shipping!</strong>
+            <Check className="h-4 w-4" /> {t("cart.freeShipping")}
           </div>
         )}
 
@@ -120,13 +122,13 @@ const Cart = () => {
                       <div>
                         <Link to={`/products/${item.slug}`} className="font-semibold text-sm md:text-base line-clamp-1 hover:text-accent transition-colors">{item.name}</Link>
                         <p className="text-xs text-muted-foreground mt-0.5">
-                          {item.size && item.size !== "—" && `Size: ${item.size}`}
-                          {item.color && item.color !== "—" && ` · Color: ${item.color}`}
+                          {item.size && item.size !== "—" && `${t("product.size")}: ${item.size}`}
+                          {item.color && item.color !== "—" && ` · ${t("product.color")}: ${item.color}`}
                           {item.is_digital && <Badge variant="outline" className="ml-2 text-[9px] py-0">Digital</Badge>}
                         </p>
-                        <p className="text-accent font-bold mt-1">₹{item.price.toLocaleString()}</p>
+                        <p className="text-accent font-bold mt-1">৳{item.price.toLocaleString()}</p>
                       </div>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => { removeItem(item.id); toast({ title: "Item removed from cart" }); }}>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-destructive" onClick={() => { removeItem(item.id); toast({ title: t("cart.removed") }); }}>
                         <Trash2 className="h-3.5 w-3.5" />
                       </Button>
                     </div>
@@ -136,7 +138,7 @@ const Cart = () => {
                         <span className="w-9 text-center text-sm font-semibold border-x border-border h-8 flex items-center justify-center">{item.quantity}</span>
                         <Button variant="ghost" size="icon" className="h-8 w-8 rounded-r-lg rounded-l-none" onClick={() => updateQuantity(item.id, item.quantity + 1)}><Plus className="h-3 w-3" /></Button>
                       </div>
-                      <p className="font-bold text-base">₹{(item.price * item.quantity).toLocaleString()}</p>
+                      <p className="font-bold text-base">৳{(item.price * item.quantity).toLocaleString()}</p>
                     </div>
                   </div>
                 </motion.div>
@@ -146,12 +148,12 @@ const Cart = () => {
 
           <div className="space-y-4">
             <div className="bg-card border border-border rounded-xl p-5 sticky top-32">
-              <h3 className="font-bold text-lg mb-4">Order Summary</h3>
+              <h3 className="font-bold text-lg mb-4">{t("cart.orderSummary")}</h3>
 
               <div className="flex gap-2 mb-4">
-                <Input placeholder="Enter coupon code" value={coupon} onChange={e => setCoupon(e.target.value)} className="rounded-full text-sm h-9" disabled={couponApplied} />
+                <Input placeholder={t("cart.enterCoupon")} value={coupon} onChange={e => setCoupon(e.target.value)} className="rounded-full text-sm h-9" disabled={couponApplied} />
                 <Button variant="outline" className="rounded-full shrink-0 h-9 text-xs" onClick={applyCoupon} disabled={couponApplied || validatingCoupon}>
-                  {validatingCoupon ? "..." : "Apply"}
+                  {validatingCoupon ? "..." : t("cart.apply")}
                 </Button>
               </div>
               {couponApplied && (
@@ -162,20 +164,20 @@ const Cart = () => {
               )}
 
               <div className="space-y-2.5 text-sm">
-                <div className="flex justify-between"><span className="text-muted-foreground">Subtotal ({items.reduce((s, i) => s + i.quantity, 0)} items)</span><span>₹{subtotal.toLocaleString()}</span></div>
-                {discount > 0 && <div className="flex justify-between text-green-600"><span>Coupon Discount</span><span>-₹{discount.toLocaleString()}</span></div>}
-                <div className="flex justify-between"><span className="text-muted-foreground">Shipping</span><span className={shipping === 0 ? "text-green-600 font-medium" : ""}>{shipping === 0 ? "Free" : `₹${shipping}`}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">{t("cart.subtotal")} ({items.reduce((s, i) => s + i.quantity, 0)} {t("cart.items")})</span><span>৳{subtotal.toLocaleString()}</span></div>
+                {discount > 0 && <div className="flex justify-between text-green-600"><span>{t("cart.couponDiscount")}</span><span>-৳{discount.toLocaleString()}</span></div>}
+                <div className="flex justify-between"><span className="text-muted-foreground">{t("cart.shipping")}</span><span className={shipping === 0 ? "text-green-600 font-medium" : ""}>{shipping === 0 ? t("cart.free") : `৳${shipping}`}</span></div>
                 <Separator />
-                <div className="flex justify-between font-bold text-lg pt-1"><span>Total</span><span className="text-accent">₹{total.toLocaleString()}</span></div>
+                <div className="flex justify-between font-bold text-lg pt-1"><span>{t("cart.total")}</span><span className="text-accent">৳{total.toLocaleString()}</span></div>
               </div>
 
               <Button className="w-full bg-accent text-accent-foreground hover:bg-accent/90 rounded-full h-12 mt-5 text-base font-semibold shadow-lg shadow-accent/20" asChild>
-                <Link to="/checkout">Proceed to Checkout <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                <Link to="/checkout">{t("cart.proceedToCheckout")} <ArrowRight className="ml-2 h-4 w-4" /></Link>
               </Button>
 
               <div className="flex items-center justify-center gap-4 mt-4 text-[10px] text-muted-foreground">
-                <span className="flex items-center gap-1"><ShieldCheck className="h-3 w-3" /> Secure Checkout</span>
-                <span className="flex items-center gap-1"><RotateCcw className="h-3 w-3" /> 15-Day Returns</span>
+                <span className="flex items-center gap-1"><ShieldCheck className="h-3 w-3" /> {t("cart.secureCheckout")}</span>
+                <span className="flex items-center gap-1"><RotateCcw className="h-3 w-3" /> {t("cart.returns")}</span>
               </div>
             </div>
           </div>

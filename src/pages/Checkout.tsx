@@ -9,29 +9,32 @@ import { Separator } from "@/components/ui/separator";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
 import {
-  CreditCard, Wallet, Building2, ShieldCheck, Check, MapPin, Package, Truck, ArrowRight, ArrowLeft, Lock
+  CreditCard, Wallet, ShieldCheck, Check, MapPin, Package, Truck, ArrowRight, ArrowLeft, Lock, Smartphone
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/contexts/CartContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
-
-const steps = [
-  { id: 1, label: "Shipping", icon: MapPin },
-  { id: 2, label: "Payment", icon: CreditCard },
-  { id: 3, label: "Review", icon: Package },
-];
 
 const Checkout = () => {
   const { items, subtotal, clearCart } = useCart();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
-  const [paymentMethod, setPaymentMethod] = useState("card");
+  const [paymentMethod, setPaymentMethod] = useState("cod");
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
   const [placingOrder, setPlacingOrder] = useState(false);
+  const [bkashTrxId, setBkashTrxId] = useState("");
+  const [nagadTrxId, setNagadTrxId] = useState("");
 
-  // Shipping form state
+  const steps = [
+    { id: 1, label: t("checkout.step.shipping"), icon: MapPin },
+    { id: 2, label: t("checkout.step.payment"), icon: CreditCard },
+    { id: 3, label: t("checkout.step.review"), icon: Package },
+  ];
+
   const [shipping, setShipping] = useState({
     firstName: "", lastName: "", email: "", address: "", city: "", postalCode: "", state: "", phone: "",
   });
@@ -47,7 +50,7 @@ const Checkout = () => {
     const required = ["firstName", "address", "city", "postalCode", "state", "phone"] as const;
     for (const f of required) {
       if (!shipping[f].trim()) {
-        toast({ title: `Please fill in ${f.replace(/([A-Z])/g, " $1").toLowerCase()}`, variant: "destructive" });
+        toast({ title: `${t("checkout.fillField")} ${f.replace(/([A-Z])/g, " $1").toLowerCase()}`, variant: "destructive" });
         return false;
       }
     }
@@ -78,13 +81,13 @@ const Checkout = () => {
           shipping_city: shipping.city,
           shipping_state: shipping.state,
           shipping_postal_code: shipping.postalCode,
+          notes: paymentMethod === "bkash" ? `bKash TrxID: ${bkashTrxId}` : paymentMethod === "nagad" ? `Nagad TrxID: ${nagadTrxId}` : null,
         })
         .select()
         .single();
 
       if (orderError) throw orderError;
 
-      // Insert order items
       const orderItems = items.map(item => ({
         order_id: order.id,
         product_id: item.product_id,
@@ -97,27 +100,17 @@ const Checkout = () => {
         is_digital: item.is_digital,
       }));
 
-      const { error: itemsError } = await supabase
-        .from("order_items")
-        .insert(orderItems);
-
+      const { error: itemsError } = await supabase.from("order_items").insert(orderItems);
       if (itemsError) throw itemsError;
 
       setOrderNumber(order.order_number || order.id.slice(0, 8));
       setOrderPlaced(true);
       clearCart();
 
-      toast({
-        title: "🎉 Order Placed Successfully!",
-        description: `Order ${order.order_number || ""} confirmed.`,
-      });
+      toast({ title: t("checkout.orderPlacedSuccess"), description: `${t("checkout.orderConfirmedDesc")} ${order.order_number || ""}` });
     } catch (err: any) {
       console.error("Order error:", err);
-      toast({
-        title: "Failed to place order",
-        description: err.message || "Please try again or log in first.",
-        variant: "destructive",
-      });
+      toast({ title: t("checkout.orderFailed"), description: err.message || t("checkout.orderFailedDesc"), variant: "destructive" });
     } finally {
       setPlacingOrder(false);
     }
@@ -127,9 +120,9 @@ const Checkout = () => {
     return (
       <Layout>
         <div className="container px-4 py-20 text-center">
-          <h1 className="text-2xl font-bold mb-4">Your cart is empty</h1>
+          <h1 className="text-2xl font-bold mb-4">{t("checkout.emptyCart")}</h1>
           <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full" asChild>
-            <Link to="/products">Browse Products</Link>
+            <Link to="/products">{t("checkout.browseProducts")}</Link>
           </Button>
         </div>
         <Footer />
@@ -146,15 +139,15 @@ const Checkout = () => {
               <Check className="h-10 w-10 text-green-600" />
             </div>
           </motion.div>
-          <h1 className="text-2xl font-bold mb-2">Order Confirmed!</h1>
-          <p className="text-muted-foreground mb-2">Your order has been placed successfully.</p>
-          <p className="text-sm font-medium mb-6">Order ID: <span className="text-accent">{orderNumber}</span></p>
+          <h1 className="text-2xl font-bold mb-2">{t("checkout.orderConfirmed")}</h1>
+          <p className="text-muted-foreground mb-2">{t("checkout.orderSuccess")}</p>
+          <p className="text-sm font-medium mb-6">{t("checkout.orderId")}: <span className="text-accent">{orderNumber}</span></p>
           <div className="flex gap-3 justify-center">
             <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full" asChild>
-              <Link to="/orders">View Orders</Link>
+              <Link to="/orders">{t("checkout.viewOrders")}</Link>
             </Button>
             <Button variant="outline" className="rounded-full" asChild>
-              <Link to="/products">Continue Shopping</Link>
+              <Link to="/products">{t("products.continueShopping")}</Link>
             </Button>
           </div>
         </div>
@@ -163,11 +156,21 @@ const Checkout = () => {
     );
   }
 
+  const paymentLabel = (method: string) => {
+    const map: Record<string, string> = {
+      bkash: t("checkout.bkash"),
+      nagad: t("checkout.nagad"),
+      cod: t("checkout.cod"),
+      card: t("checkout.card"),
+    };
+    return map[method] || method;
+  };
+
   return (
     <Layout>
       <div className="bg-secondary/50 border-b border-border">
         <div className="container px-4 py-5">
-          <h1 className="text-2xl md:text-3xl font-bold">Checkout</h1>
+          <h1 className="text-2xl md:text-3xl font-bold">{t("checkout.title")}</h1>
           <div className="flex items-center gap-0 mt-4 max-w-md">
             {steps.map((s, i) => (
               <div key={s.id} className="flex items-center flex-1">
@@ -193,21 +196,21 @@ const Checkout = () => {
               {step === 1 && (
                 <motion.div key="shipping" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
                   <div className="bg-card border border-border rounded-xl p-5 md:p-6">
-                    <h2 className="font-bold text-lg mb-5 flex items-center gap-2"><MapPin className="h-5 w-5 text-accent" /> Shipping Address</h2>
+                    <h2 className="font-bold text-lg mb-5 flex items-center gap-2"><MapPin className="h-5 w-5 text-accent" /> {t("checkout.shippingAddress")}</h2>
                     <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-1.5"><Label className="text-xs font-medium">First Name *</Label><Input value={shipping.firstName} onChange={e => handleShippingChange("firstName", e.target.value)} placeholder="John" className="rounded-lg" /></div>
-                      <div className="space-y-1.5"><Label className="text-xs font-medium">Last Name</Label><Input value={shipping.lastName} onChange={e => handleShippingChange("lastName", e.target.value)} placeholder="Smith" className="rounded-lg" /></div>
-                      <div className="col-span-2 space-y-1.5"><Label className="text-xs font-medium">Email</Label><Input value={shipping.email} onChange={e => handleShippingChange("email", e.target.value)} type="email" placeholder="john@example.com" className="rounded-lg" /></div>
-                      <div className="col-span-2 space-y-1.5"><Label className="text-xs font-medium">Address *</Label><Input value={shipping.address} onChange={e => handleShippingChange("address", e.target.value)} placeholder="123 Main Street, Apt 4B" className="rounded-lg" /></div>
-                      <div className="space-y-1.5"><Label className="text-xs font-medium">City *</Label><Input value={shipping.city} onChange={e => handleShippingChange("city", e.target.value)} placeholder="Mumbai" className="rounded-lg" /></div>
-                      <div className="space-y-1.5"><Label className="text-xs font-medium">PIN Code *</Label><Input value={shipping.postalCode} onChange={e => handleShippingChange("postalCode", e.target.value)} placeholder="400001" className="rounded-lg" /></div>
-                      <div className="space-y-1.5"><Label className="text-xs font-medium">State *</Label><Input value={shipping.state} onChange={e => handleShippingChange("state", e.target.value)} placeholder="Maharashtra" className="rounded-lg" /></div>
-                      <div className="space-y-1.5"><Label className="text-xs font-medium">Phone *</Label><Input value={shipping.phone} onChange={e => handleShippingChange("phone", e.target.value)} placeholder="+91 98765 43210" className="rounded-lg" /></div>
+                      <div className="space-y-1.5"><Label className="text-xs font-medium">{t("checkout.firstName")}</Label><Input value={shipping.firstName} onChange={e => handleShippingChange("firstName", e.target.value)} className="rounded-lg" /></div>
+                      <div className="space-y-1.5"><Label className="text-xs font-medium">{t("checkout.lastName")}</Label><Input value={shipping.lastName} onChange={e => handleShippingChange("lastName", e.target.value)} className="rounded-lg" /></div>
+                      <div className="col-span-2 space-y-1.5"><Label className="text-xs font-medium">{t("checkout.email")}</Label><Input value={shipping.email} onChange={e => handleShippingChange("email", e.target.value)} type="email" className="rounded-lg" /></div>
+                      <div className="col-span-2 space-y-1.5"><Label className="text-xs font-medium">{t("checkout.address")}</Label><Input value={shipping.address} onChange={e => handleShippingChange("address", e.target.value)} className="rounded-lg" /></div>
+                      <div className="space-y-1.5"><Label className="text-xs font-medium">{t("checkout.city")}</Label><Input value={shipping.city} onChange={e => handleShippingChange("city", e.target.value)} className="rounded-lg" /></div>
+                      <div className="space-y-1.5"><Label className="text-xs font-medium">{t("checkout.postalCode")}</Label><Input value={shipping.postalCode} onChange={e => handleShippingChange("postalCode", e.target.value)} className="rounded-lg" /></div>
+                      <div className="space-y-1.5"><Label className="text-xs font-medium">{t("checkout.state")}</Label><Input value={shipping.state} onChange={e => handleShippingChange("state", e.target.value)} className="rounded-lg" /></div>
+                      <div className="space-y-1.5"><Label className="text-xs font-medium">{t("checkout.phone")}</Label><Input value={shipping.phone} onChange={e => handleShippingChange("phone", e.target.value)} className="rounded-lg" /></div>
                     </div>
                   </div>
                   <div className="flex justify-between mt-5">
-                    <Button variant="ghost" className="rounded-full" asChild><Link to="/cart"><ArrowLeft className="h-4 w-4 mr-1" /> Back to Cart</Link></Button>
-                    <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full" onClick={() => { if (validateShipping()) setStep(2); }}>Continue to Payment <ArrowRight className="ml-2 h-4 w-4" /></Button>
+                    <Button variant="ghost" className="rounded-full" asChild><Link to="/cart"><ArrowLeft className="h-4 w-4 mr-1" /> {t("checkout.backToCart")}</Link></Button>
+                    <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full" onClick={() => { if (validateShipping()) setStep(2); }}>{t("checkout.continueToPayment")} <ArrowRight className="ml-2 h-4 w-4" /></Button>
                   </div>
                 </motion.div>
               )}
@@ -215,30 +218,62 @@ const Checkout = () => {
               {step === 2 && (
                 <motion.div key="payment" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
                   <div className="bg-card border border-border rounded-xl p-5 md:p-6">
-                    <h2 className="font-bold text-lg mb-5 flex items-center gap-2"><CreditCard className="h-5 w-5 text-accent" /> Payment Method</h2>
+                    <h2 className="font-bold text-lg mb-5 flex items-center gap-2"><CreditCard className="h-5 w-5 text-accent" /> {t("checkout.paymentMethod")}</h2>
                     <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod} className="space-y-3">
                       {[
-                        { value: "card", label: "Credit / Debit Card", desc: "Visa, Mastercard, RuPay", icon: CreditCard },
-                        { value: "upi", label: "UPI Payment", desc: "GPay, PhonePe, Paytm", icon: Wallet },
-                        { value: "netbanking", label: "Net Banking", desc: "All major banks supported", icon: Building2 },
-                        { value: "cod", label: "Cash on Delivery", desc: "Pay when you receive", icon: Package },
-                      ].map(({ value, label, desc, icon: Icon }) => (
-                        <label key={value} className={`flex items-center gap-3 border rounded-xl p-4 cursor-pointer transition-all ${
-                          paymentMethod === value ? "border-accent bg-accent/5 ring-1 ring-accent/20" : "border-border hover:bg-secondary/50"
-                        }`}>
-                          <RadioGroupItem value={value} />
-                          <Icon className="h-5 w-5 text-muted-foreground" />
-                          <div className="flex-1">
-                            <span className="text-sm font-medium">{label}</span>
-                            <p className="text-[10px] text-muted-foreground">{desc}</p>
-                          </div>
-                        </label>
+                        { value: "bkash", label: t("checkout.bkash"), desc: t("checkout.bkashDesc"), icon: Smartphone, color: "text-pink-600" },
+                        { value: "nagad", label: t("checkout.nagad"), desc: t("checkout.nagadDesc"), icon: Smartphone, color: "text-orange-600" },
+                        { value: "cod", label: t("checkout.cod"), desc: t("checkout.codDesc"), icon: Package, color: "text-muted-foreground" },
+                        { value: "card", label: t("checkout.card"), desc: t("checkout.cardDesc"), icon: CreditCard, color: "text-muted-foreground" },
+                      ].map(({ value, label, desc, icon: Icon, color }) => (
+                        <div key={value}>
+                          <label className={`flex items-center gap-3 border rounded-xl p-4 cursor-pointer transition-all ${
+                            paymentMethod === value ? "border-accent bg-accent/5 ring-1 ring-accent/20" : "border-border hover:bg-secondary/50"
+                          }`}>
+                            <RadioGroupItem value={value} />
+                            <Icon className={`h-5 w-5 ${color}`} />
+                            <div className="flex-1">
+                              <span className="text-sm font-medium">{label}</span>
+                              {value === "bkash" && <Badge className="ml-2 bg-pink-600 text-white text-[9px] py-0">bKash</Badge>}
+                              {value === "nagad" && <Badge className="ml-2 bg-orange-600 text-white text-[9px] py-0">Nagad</Badge>}
+                              <p className="text-[10px] text-muted-foreground">{desc}</p>
+                            </div>
+                          </label>
+                          {/* bKash details */}
+                          {paymentMethod === "bkash" && value === "bkash" && (
+                            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="mt-2 bg-pink-50 dark:bg-pink-900/10 border border-pink-200 dark:border-pink-800 rounded-lg p-4 space-y-3">
+                              <p className="text-xs text-pink-700 dark:text-pink-400">{t("checkout.paymentInstructions.bkash")}</p>
+                              <div className="space-y-1.5">
+                                <Label className="text-xs font-medium">{t("checkout.bkashNumber")}</Label>
+                                <Input value="01XXXXXXXXX" disabled className="rounded-lg bg-pink-100/50 dark:bg-pink-900/20 text-sm" />
+                              </div>
+                              <div className="space-y-1.5">
+                                <Label className="text-xs font-medium">{t("checkout.trxId")} *</Label>
+                                <Input value={bkashTrxId} onChange={e => setBkashTrxId(e.target.value)} placeholder="e.g. TRX12345678" className="rounded-lg text-sm" />
+                              </div>
+                            </motion.div>
+                          )}
+                          {/* Nagad details */}
+                          {paymentMethod === "nagad" && value === "nagad" && (
+                            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="mt-2 bg-orange-50 dark:bg-orange-900/10 border border-orange-200 dark:border-orange-800 rounded-lg p-4 space-y-3">
+                              <p className="text-xs text-orange-700 dark:text-orange-400">{t("checkout.paymentInstructions.nagad")}</p>
+                              <div className="space-y-1.5">
+                                <Label className="text-xs font-medium">{t("checkout.nagadNumber")}</Label>
+                                <Input value="01XXXXXXXXX" disabled className="rounded-lg bg-orange-100/50 dark:bg-orange-900/20 text-sm" />
+                              </div>
+                              <div className="space-y-1.5">
+                                <Label className="text-xs font-medium">{t("checkout.trxId")} *</Label>
+                                <Input value={nagadTrxId} onChange={e => setNagadTrxId(e.target.value)} placeholder="e.g. TRX12345678" className="rounded-lg text-sm" />
+                              </div>
+                            </motion.div>
+                          )}
+                        </div>
                       ))}
                     </RadioGroup>
                   </div>
                   <div className="flex justify-between mt-5">
-                    <Button variant="ghost" className="rounded-full" onClick={() => setStep(1)}><ArrowLeft className="h-4 w-4 mr-1" /> Back</Button>
-                    <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full" onClick={() => setStep(3)}>Review Order <ArrowRight className="ml-2 h-4 w-4" /></Button>
+                    <Button variant="ghost" className="rounded-full" onClick={() => setStep(1)}><ArrowLeft className="h-4 w-4 mr-1" /> {t("checkout.back")}</Button>
+                    <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full" onClick={() => setStep(3)}>{t("checkout.reviewOrder")} <ArrowRight className="ml-2 h-4 w-4" /></Button>
                   </div>
                 </motion.div>
               )}
@@ -248,8 +283,8 @@ const Checkout = () => {
                   <div className="space-y-4">
                     <div className="bg-card border border-border rounded-xl p-5">
                       <div className="flex items-center justify-between mb-3">
-                        <h3 className="font-semibold text-sm flex items-center gap-1.5"><MapPin className="h-4 w-4 text-accent" /> Shipping Address</h3>
-                        <Button variant="ghost" size="sm" className="text-xs text-accent" onClick={() => setStep(1)}>Edit</Button>
+                        <h3 className="font-semibold text-sm flex items-center gap-1.5"><MapPin className="h-4 w-4 text-accent" /> {t("checkout.shippingAddress")}</h3>
+                        <Button variant="ghost" size="sm" className="text-xs text-accent" onClick={() => setStep(1)}>{t("checkout.edit")}</Button>
                       </div>
                       <p className="text-sm">{shipping.firstName} {shipping.lastName}</p>
                       <p className="text-xs text-muted-foreground">{shipping.address} · {shipping.city}, {shipping.state} {shipping.postalCode} · {shipping.phone}</p>
@@ -257,14 +292,16 @@ const Checkout = () => {
 
                     <div className="bg-card border border-border rounded-xl p-5">
                       <div className="flex items-center justify-between mb-3">
-                        <h3 className="font-semibold text-sm flex items-center gap-1.5"><CreditCard className="h-4 w-4 text-accent" /> Payment</h3>
-                        <Button variant="ghost" size="sm" className="text-xs text-accent" onClick={() => setStep(2)}>Edit</Button>
+                        <h3 className="font-semibold text-sm flex items-center gap-1.5"><CreditCard className="h-4 w-4 text-accent" /> {t("checkout.payment")}</h3>
+                        <Button variant="ghost" size="sm" className="text-xs text-accent" onClick={() => setStep(2)}>{t("checkout.edit")}</Button>
                       </div>
-                      <p className="text-sm capitalize">{paymentMethod === "cod" ? "Cash on Delivery" : paymentMethod === "card" ? "Credit / Debit Card" : paymentMethod.toUpperCase()}</p>
+                      <p className="text-sm">{paymentLabel(paymentMethod)}</p>
+                      {paymentMethod === "bkash" && bkashTrxId && <p className="text-xs text-muted-foreground">TrxID: {bkashTrxId}</p>}
+                      {paymentMethod === "nagad" && nagadTrxId && <p className="text-xs text-muted-foreground">TrxID: {nagadTrxId}</p>}
                     </div>
 
                     <div className="bg-card border border-border rounded-xl p-5">
-                      <h3 className="font-semibold text-sm mb-3 flex items-center gap-1.5"><Package className="h-4 w-4 text-accent" /> Items</h3>
+                      <h3 className="font-semibold text-sm mb-3 flex items-center gap-1.5"><Package className="h-4 w-4 text-accent" /> {t("checkout.items")}</h3>
                       {items.map((item) => (
                         <div key={item.id} className="flex items-center gap-3 py-2.5 border-b border-border last:border-0">
                           <div className="w-12 h-14 rounded-lg overflow-hidden bg-secondary shrink-0">
@@ -278,24 +315,24 @@ const Checkout = () => {
                               Qty: {item.quantity}
                             </p>
                           </div>
-                          <p className="text-sm font-bold">₹{(item.price * item.quantity).toLocaleString()}</p>
+                          <p className="text-sm font-bold">৳{(item.price * item.quantity).toLocaleString()}</p>
                         </div>
                       ))}
                     </div>
 
                     <div className="bg-card border border-border rounded-xl p-5">
-                      <div className="flex items-center gap-2 mb-3"><Truck className="h-4 w-4 text-accent" /><span className="text-sm font-medium">Estimated delivery: <strong>3-5 business days</strong></span></div>
-                      <p className="text-xs text-muted-foreground">Standard shipping · {shippingCost === 0 ? "Free" : `₹${shippingCost}`}</p>
+                      <div className="flex items-center gap-2 mb-3"><Truck className="h-4 w-4 text-accent" /><span className="text-sm font-medium">{t("checkout.estimatedDelivery")}</span></div>
+                      <p className="text-xs text-muted-foreground">{t("checkout.standardShipping")} · {shippingCost === 0 ? t("cart.free") : `৳${shippingCost}`}</p>
                     </div>
                   </div>
                   <div className="flex justify-between mt-5">
-                    <Button variant="ghost" className="rounded-full" onClick={() => setStep(2)}><ArrowLeft className="h-4 w-4 mr-1" /> Back</Button>
+                    <Button variant="ghost" className="rounded-full" onClick={() => setStep(2)}><ArrowLeft className="h-4 w-4 mr-1" /> {t("checkout.back")}</Button>
                     <Button
                       className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full h-12 px-8 text-base font-semibold shadow-lg shadow-accent/20"
                       onClick={placeOrder}
                       disabled={placingOrder}
                     >
-                      <Lock className="h-4 w-4 mr-2" /> {placingOrder ? "Placing Order..." : `Place Order — ₹${total.toLocaleString()}`}
+                      <Lock className="h-4 w-4 mr-2" /> {placingOrder ? t("checkout.placingOrder") : `${t("checkout.placeOrder")} — ৳${total.toLocaleString()}`}
                     </Button>
                   </div>
                 </motion.div>
@@ -305,7 +342,7 @@ const Checkout = () => {
 
           <div className="md:col-span-2">
             <div className="bg-card border border-border rounded-xl p-5 sticky top-32">
-              <h3 className="font-bold mb-4">Order Summary</h3>
+              <h3 className="font-bold mb-4">{t("cart.orderSummary")}</h3>
               <div className="space-y-2 max-h-40 overflow-y-auto mb-3">
                 {items.map((item) => (
                   <div key={item.id} className="flex items-center gap-2">
@@ -316,19 +353,19 @@ const Checkout = () => {
                       <p className="text-xs font-medium line-clamp-1">{item.name}</p>
                       <p className="text-[10px] text-muted-foreground">× {item.quantity}</p>
                     </div>
-                    <span className="text-xs font-bold">₹{(item.price * item.quantity).toLocaleString()}</span>
+                    <span className="text-xs font-bold">৳{(item.price * item.quantity).toLocaleString()}</span>
                   </div>
                 ))}
               </div>
               <Separator className="my-3" />
               <div className="space-y-2 text-sm">
-                <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span>₹{subtotal.toLocaleString()}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Shipping</span><span className={shippingCost === 0 ? "text-green-600" : ""}>{shippingCost === 0 ? "Free" : `₹${shippingCost}`}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">{t("cart.subtotal")}</span><span>৳{subtotal.toLocaleString()}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">{t("cart.shipping")}</span><span className={shippingCost === 0 ? "text-green-600" : ""}>{shippingCost === 0 ? t("cart.free") : `৳${shippingCost}`}</span></div>
                 <Separator />
-                <div className="flex justify-between font-bold text-lg"><span>Total</span><span className="text-accent">₹{total.toLocaleString()}</span></div>
+                <div className="flex justify-between font-bold text-lg"><span>{t("cart.total")}</span><span className="text-accent">৳{total.toLocaleString()}</span></div>
               </div>
               <div className="flex items-center justify-center gap-1.5 mt-4 text-[10px] text-muted-foreground">
-                <ShieldCheck className="h-3.5 w-3.5" /> 256-bit SSL encrypted · 100% secure
+                <ShieldCheck className="h-3.5 w-3.5" /> {t("checkout.ssl")}
               </div>
             </div>
           </div>
