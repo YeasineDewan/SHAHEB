@@ -1,41 +1,41 @@
 import { useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Package, MapPin, CheckCircle2, Truck, Clock, CircleDot, Search } from "lucide-react";
-
-const trackingSteps = [
-  { label: "Order Placed", date: "Mar 5, 2026 · 10:30 AM", done: true, icon: Package },
-  { label: "Payment Confirmed", date: "Mar 5, 2026 · 10:32 AM", done: true, icon: CheckCircle2 },
-  { label: "Shipped", date: "Mar 6, 2026 · 2:15 PM", done: true, icon: Truck },
-  { label: "Out for Delivery", date: "Mar 8, 2026 · 9:00 AM", done: true, icon: MapPin },
-  { label: "Delivered", date: "Expected: Mar 8, 2026", done: false, icon: CircleDot },
-];
+import { Package, MapPin, CheckCircle2, Truck, CircleDot, Search } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const TrackOrder = () => {
+  const { t } = useLanguage();
   const [orderId, setOrderId] = useState("ORD-2026-001");
   const [tracked, setTracked] = useState(true);
+
+  const trackingSteps = [
+    { label: t("track.orderPlaced"), date: "Mar 5, 2026 · 10:30 AM", done: true, icon: Package },
+    { label: t("track.paymentConfirmed"), date: "Mar 5, 2026 · 10:32 AM", done: true, icon: CheckCircle2 },
+    { label: t("track.shipped"), date: "Mar 6, 2026 · 2:15 PM", done: true, icon: Truck },
+    { label: t("track.outForDelivery"), date: "Mar 8, 2026 · 9:00 AM", done: true, icon: MapPin },
+    { label: t("track.delivered"), date: `${t("track.expected")}: Mar 8, 2026`, done: false, icon: CircleDot },
+  ];
 
   return (
     <Layout>
       <div className="container px-4 py-8 md:py-12 max-w-2xl">
-        <h1 className="text-2xl md:text-3xl font-bold mb-2">Track Your Order</h1>
-        <p className="text-muted-foreground text-sm mb-8">Enter your order ID to see real-time status updates.</p>
+        <h1 className="text-2xl md:text-3xl font-bold mb-2">{t("track.title")}</h1>
+        <p className="text-muted-foreground text-sm mb-8">{t("track.desc")}</p>
 
         <div className="flex gap-2 mb-8">
           <Input
-            placeholder="Enter Order ID (e.g., ORD-2026-001)"
+            placeholder={t("track.placeholder")}
             value={orderId}
             onChange={e => setOrderId(e.target.value)}
             className="rounded-full"
           />
           <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full px-6" onClick={() => setTracked(true)}>
             <Search className="h-4 w-4 md:mr-2" />
-            <span className="hidden md:inline">Track</span>
+            <span className="hidden md:inline">{t("track.button")}</span>
           </Button>
         </div>
 
@@ -43,13 +43,12 @@ const TrackOrder = () => {
           <div className="bg-card border border-border rounded-2xl overflow-hidden">
             <div className="flex items-center justify-between px-6 py-4 bg-secondary/50 border-b border-border">
               <div>
-                <p className="text-xs text-muted-foreground">Order ID</p>
+                <p className="text-xs text-muted-foreground">{t("track.orderId")}</p>
                 <p className="font-bold">ORD-2026-001</p>
               </div>
-              <Badge className="bg-accent/10 text-accent border-accent/20">In Transit</Badge>
+              <Badge className="bg-accent/10 text-accent border-accent/20">{t("track.inTransit")}</Badge>
             </div>
 
-            {/* Items preview */}
             <div className="px-6 py-4 border-b border-border">
               <div className="flex gap-3">
                 {["https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=80&h=100&fit=crop",
@@ -59,14 +58,13 @@ const TrackOrder = () => {
                   </div>
                 ))}
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium">2 items</p>
+                  <p className="text-sm font-medium">2 {t("general.items")}</p>
                   <p className="text-xs text-muted-foreground">Classic Oxford Shirt × 2, Leather Jacket × 1</p>
-                  <p className="text-sm font-bold text-accent mt-1">₹10,997</p>
+                  <p className="text-sm font-bold text-accent mt-1">৳10,997</p>
                 </div>
               </div>
             </div>
 
-            {/* Timeline */}
             <div className="px-6 py-6">
               <div className="space-y-0">
                 {trackingSteps.map((step, i) => {
@@ -94,18 +92,17 @@ const TrackOrder = () => {
               </div>
             </div>
 
-            {/* Delivery details */}
             <div className="px-6 py-4 border-t border-border bg-secondary/30">
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <p className="text-xs text-muted-foreground mb-1">Shipping Address</p>
+                  <p className="text-xs text-muted-foreground mb-1">{t("track.shippingAddress")}</p>
                   <p className="font-medium text-sm">John Smith</p>
-                  <p className="text-xs text-muted-foreground">123 Main Street, Mumbai 400001</p>
+                  <p className="text-xs text-muted-foreground">গুলশান-২, ঢাকা ১২১২</p>
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground mb-1">Carrier</p>
-                  <p className="font-medium text-sm">Blue Dart Express</p>
-                  <p className="text-xs text-muted-foreground">AWB: BD9876543210</p>
+                  <p className="text-xs text-muted-foreground mb-1">{t("track.carrier")}</p>
+                  <p className="font-medium text-sm">Pathao Courier</p>
+                  <p className="text-xs text-muted-foreground">AWB: PT9876543210</p>
                 </div>
               </div>
             </div>

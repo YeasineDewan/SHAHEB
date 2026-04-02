@@ -16,11 +16,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useCart } from "@/contexts/CartContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import type { Tables } from "@/integrations/supabase/types";
 
 const ProductDetail = () => {
   const { id } = useParams();
   const { addItem } = useCart();
+  const { t } = useLanguage();
   const [product, setProduct] = useState<Tables<"products"> | null>(null);
   const [relatedProducts, setRelatedProducts] = useState<Tables<"products">[]>([]);
   const [loading, setLoading] = useState(true);
@@ -34,7 +36,6 @@ const ProductDetail = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       setLoading(true);
-      // Try slug first, then id
       let { data, error } = await supabase
         .from("products")
         .select("*")
@@ -52,7 +53,6 @@ const ProductDetail = () => {
       if (data) {
         setProduct(data);
         setSelectedColor(data.colors?.[0] || "");
-        // Fetch related
         const { data: related } = await supabase
           .from("products")
           .select("*")
@@ -93,10 +93,10 @@ const ProductDetail = () => {
     return (
       <Layout>
         <div className="container px-4 py-20 text-center">
-          <h1 className="text-2xl font-bold mb-4">Product Not Found</h1>
-          <p className="text-muted-foreground mb-6">The product you're looking for doesn't exist or has been removed.</p>
+          <h1 className="text-2xl font-bold mb-4">{t("product.notFound")}</h1>
+          <p className="text-muted-foreground mb-6">{t("product.notFoundDesc")}</p>
           <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full" asChild>
-            <Link to="/products">Browse Products</Link>
+            <Link to="/products">{t("general.browseProducts")}</Link>
           </Button>
         </div>
         <Footer />
@@ -112,7 +112,7 @@ const ProductDetail = () => {
 
   const handleAddToCart = () => {
     if (sizes.length > 0 && !selectedSize) {
-      toast({ title: "Please select a size", variant: "destructive" });
+      toast({ title: t("product.selectSize"), variant: "destructive" });
       return;
     }
     addItem({
@@ -127,26 +127,25 @@ const ProductDetail = () => {
       is_digital: product.is_digital || false,
       slug: product.slug,
     });
-    toast({ title: "Added to cart!", description: `${product.name}${selectedColor ? ` (${selectedColor})` : ""}${selectedSize ? `, ${selectedSize}` : ""} × ${quantity}` });
+    toast({ title: t("products.addedToCart"), description: `${product.name}${selectedColor ? ` (${selectedColor})` : ""}${selectedSize ? `, ${selectedSize}` : ""} × ${quantity}` });
   };
 
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
-    toast({ title: "Link copied to clipboard!" });
+    toast({ title: t("product.linkCopied") });
   };
 
   return (
     <Layout>
       <div className="container px-4 py-6 md:py-10">
         <div className="text-xs text-muted-foreground mb-6 flex items-center gap-1 flex-wrap">
-          <Link to="/" className="hover:text-foreground">Home</Link> <ChevronRight className="h-3 w-3" />
-          <Link to="/products" className="hover:text-foreground">Products</Link> <ChevronRight className="h-3 w-3" />
+          <Link to="/" className="hover:text-foreground">{t("general.home")}</Link> <ChevronRight className="h-3 w-3" />
+          <Link to="/products" className="hover:text-foreground">{t("nav.products")}</Link> <ChevronRight className="h-3 w-3" />
           <Link to={`/category/${product.category.toLowerCase()}`} className="hover:text-foreground capitalize">{product.category}</Link> <ChevronRight className="h-3 w-3" />
           <span className="text-foreground">{product.name}</span>
         </div>
 
         <div className="grid md:grid-cols-2 gap-6 md:gap-10">
-          {/* Images */}
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-3">
             <div className="relative aspect-[4/5] rounded-xl overflow-hidden bg-secondary cursor-zoom-in group" onClick={() => setShowZoom(true)}>
               <img src={images[selectedImage]} alt={product.name} className="w-full h-full object-cover" />
@@ -167,25 +166,24 @@ const ProductDetail = () => {
             )}
           </motion.div>
 
-          {/* Info */}
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
             <div className="flex items-center gap-2 mb-2">
               <Badge className="bg-accent text-accent-foreground capitalize">{product.category}</Badge>
               {inStock ? (
-                <Badge variant="outline" className="text-green-600 border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20"><Check className="h-3 w-3 mr-1" />In Stock</Badge>
+                <Badge variant="outline" className="text-green-600 border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20"><Check className="h-3 w-3 mr-1" />{t("product.inStock")}</Badge>
               ) : (
-                <Badge variant="destructive">Out of Stock</Badge>
+                <Badge variant="destructive">{t("product.outOfStock")}</Badge>
               )}
             </div>
             <h1 className="text-2xl md:text-3xl font-bold mb-1">{product.name}</h1>
             <p className="text-xs text-muted-foreground mb-3">SKU: {product.slug}</p>
 
             <div className="flex items-baseline gap-3 mb-4">
-              <span className="text-3xl font-bold text-accent">₹{product.price.toLocaleString()}</span>
+              <span className="text-3xl font-bold text-accent">৳{product.price.toLocaleString()}</span>
               {product.original_price && (
                 <>
-                  <span className="text-lg text-muted-foreground line-through">₹{product.original_price.toLocaleString()}</span>
-                  <Badge variant="destructive" className="text-xs">Save ₹{(product.original_price - product.price).toLocaleString()}</Badge>
+                  <span className="text-lg text-muted-foreground line-through">৳{product.original_price.toLocaleString()}</span>
+                  <Badge variant="destructive" className="text-xs">{t("product.save")} ৳{(product.original_price - product.price).toLocaleString()}</Badge>
                 </>
               )}
             </div>
@@ -194,10 +192,9 @@ const ProductDetail = () => {
               <p className="text-muted-foreground leading-relaxed mb-6 text-sm">{product.description}</p>
             )}
 
-            {/* Colors */}
             {colors.length > 0 && (
               <div className="mb-5">
-                <p className="text-sm font-semibold mb-2.5">Color: <span className="font-normal text-muted-foreground">{selectedColor}</span></p>
+                <p className="text-sm font-semibold mb-2.5">{t("product.color")}: <span className="font-normal text-muted-foreground">{selectedColor}</span></p>
                 <div className="flex gap-2 flex-wrap">
                   {colors.map(c => (
                     <button key={c} onClick={() => setSelectedColor(c)}
@@ -209,10 +206,9 @@ const ProductDetail = () => {
               </div>
             )}
 
-            {/* Sizes */}
             {sizes.length > 0 && (
               <div className="mb-5">
-                <p className="text-sm font-semibold mb-2.5">Size{selectedSize && `: ${selectedSize}`}</p>
+                <p className="text-sm font-semibold mb-2.5">{t("product.size")}{selectedSize && `: ${selectedSize}`}</p>
                 <div className="flex gap-2 flex-wrap">
                   {sizes.map(size => (
                     <button key={size} onClick={() => setSelectedSize(size)}
@@ -224,9 +220,8 @@ const ProductDetail = () => {
               </div>
             )}
 
-            {/* Quantity */}
             <div className="mb-6">
-              <p className="text-sm font-semibold mb-2.5">Quantity</p>
+              <p className="text-sm font-semibold mb-2.5">{t("product.quantity")}</p>
               <div className="inline-flex items-center border border-border rounded-lg">
                 <Button variant="ghost" size="icon" className="h-10 w-10 rounded-l-lg rounded-r-none" onClick={() => setQuantity(Math.max(1, quantity - 1))}><Minus className="h-4 w-4" /></Button>
                 <span className="w-12 text-center font-semibold text-sm border-x border-border h-10 flex items-center justify-center">{quantity}</span>
@@ -234,13 +229,12 @@ const ProductDetail = () => {
               </div>
             </div>
 
-            {/* Actions */}
             <div className="flex gap-3 mb-6">
               <Button className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90 h-12 rounded-full text-base font-semibold shadow-lg shadow-accent/20" onClick={handleAddToCart} disabled={!inStock}>
-                <ShoppingBag className="mr-2 h-5 w-5" /> Add to Cart — ₹{(product.price * quantity).toLocaleString()}
+                <ShoppingBag className="mr-2 h-5 w-5" /> {t("product.addToCart")} — ৳{(product.price * quantity).toLocaleString()}
               </Button>
               <Button variant="outline" size="icon" className={`h-12 w-12 rounded-full ${isWishlisted ? "text-red-500 border-red-200" : ""}`}
-                onClick={() => { setIsWishlisted(!isWishlisted); toast({ title: isWishlisted ? "Removed from wishlist" : "Added to wishlist!" }); }}>
+                onClick={() => { setIsWishlisted(!isWishlisted); toast({ title: isWishlisted ? "Removed from wishlist" : t("products.addedToWishlist") }); }}>
                 <Heart className={`h-5 w-5 ${isWishlisted ? "fill-red-500" : ""}`} />
               </Button>
               <Button variant="outline" size="icon" className="h-12 w-12 rounded-full" onClick={handleShare}>
@@ -249,15 +243,14 @@ const ProductDetail = () => {
             </div>
 
             <Button variant="outline" className="w-full h-12 rounded-full text-base font-semibold mb-6" asChild>
-              <Link to="/checkout">Buy Now</Link>
+              <Link to="/checkout">{t("product.buyNow")}</Link>
             </Button>
 
-            {/* Trust */}
             <div className="grid grid-cols-3 gap-3 bg-secondary/50 rounded-xl p-4">
               {[
-                { icon: Truck, label: "Free Delivery", sub: "Orders ₹999+" },
-                { icon: ShieldCheck, label: "Genuine Product", sub: "100% Authentic" },
-                { icon: RotateCcw, label: "Easy Returns", sub: "15 Days" },
+                { icon: Truck, label: t("product.freeDelivery"), sub: t("product.ordersAbove") },
+                { icon: ShieldCheck, label: t("product.genuine"), sub: t("product.authentic") },
+                { icon: RotateCcw, label: t("product.easyReturns"), sub: t("product.returnDays") },
               ].map(({ icon: Icon, label, sub }) => (
                 <div key={label} className="flex flex-col items-center text-center gap-1">
                   <Icon className="h-5 w-5 text-accent" />
@@ -269,11 +262,10 @@ const ProductDetail = () => {
           </motion.div>
         </div>
 
-        {/* Description tab */}
         {product.description && (
           <Tabs defaultValue="description" className="mt-12">
             <TabsList className="w-full justify-start border-b bg-transparent rounded-none p-0 h-auto overflow-x-auto">
-              <TabsTrigger value="description" className="rounded-none border-b-2 border-transparent data-[state=active]:border-accent data-[state=active]:bg-transparent px-5 py-3 text-sm whitespace-nowrap">Description</TabsTrigger>
+              <TabsTrigger value="description" className="rounded-none border-b-2 border-transparent data-[state=active]:border-accent data-[state=active]:bg-transparent px-5 py-3 text-sm whitespace-nowrap">{t("product.description")}</TabsTrigger>
             </TabsList>
             <TabsContent value="description" className="pt-6">
               <p className="text-sm text-muted-foreground leading-relaxed max-w-2xl">{product.description}</p>
@@ -281,10 +273,9 @@ const ProductDetail = () => {
           </Tabs>
         )}
 
-        {/* Related */}
         {relatedProducts.length > 0 && (
           <div className="mt-16">
-            <h2 className="text-2xl font-bold mb-6">You May Also Like</h2>
+            <h2 className="text-2xl font-bold mb-6">{t("product.related")}</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-5">
               {relatedProducts.map(p => (
                 <Link key={p.id} to={`/products/${p.slug}`} className="group block">
@@ -294,8 +285,8 @@ const ProductDetail = () => {
                   <p className="text-[10px] uppercase text-muted-foreground tracking-wider capitalize">{p.category}</p>
                   <h3 className="text-sm font-medium line-clamp-1">{p.name}</h3>
                   <div className="flex items-center gap-2 mt-0.5">
-                    <span className="text-accent font-bold text-sm">₹{p.price.toLocaleString()}</span>
-                    {p.original_price && <span className="text-xs text-muted-foreground line-through">₹{p.original_price.toLocaleString()}</span>}
+                    <span className="text-accent font-bold text-sm">৳{p.price.toLocaleString()}</span>
+                    {p.original_price && <span className="text-xs text-muted-foreground line-through">৳{p.original_price.toLocaleString()}</span>}
                   </div>
                 </Link>
               ))}
@@ -304,7 +295,6 @@ const ProductDetail = () => {
         )}
       </div>
 
-      {/* Image zoom */}
       <Dialog open={showZoom} onOpenChange={setShowZoom}>
         <DialogContent className="max-w-4xl p-1">
           <DialogTitle className="sr-only">Image Zoom</DialogTitle>
