@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Package, Download, FileText, Eye, ShoppingBag } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useLanguage } from "@/contexts/LanguageContext";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Order = Tables<"orders"> & { order_items: Tables<"order_items">[] };
@@ -20,6 +21,7 @@ const statusColor: Record<string, string> = {
 };
 
 const Orders = () => {
+  const { t } = useLanguage();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
@@ -49,7 +51,7 @@ const Orders = () => {
   return (
     <Layout>
       <div className="container px-4 py-8 md:py-12 max-w-3xl">
-        <h1 className="text-2xl md:text-3xl font-bold mb-8">My Orders</h1>
+        <h1 className="text-2xl md:text-3xl font-bold mb-8">{t("orders.title")}</h1>
 
         {loading ? (
           <div className="space-y-4">
@@ -66,10 +68,10 @@ const Orders = () => {
             <div className="w-20 h-20 rounded-full bg-secondary flex items-center justify-center mx-auto mb-6">
               <ShoppingBag className="h-10 w-10 text-muted-foreground/40" />
             </div>
-            <h2 className="text-xl font-bold mb-2">No orders yet</h2>
-            <p className="text-muted-foreground mb-6">Start shopping to see your orders here.</p>
+            <h2 className="text-xl font-bold mb-2">{t("orders.empty")}</h2>
+            <p className="text-muted-foreground mb-6">{t("orders.emptyDesc")}</p>
             <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full" asChild>
-              <Link to="/products">Browse Products</Link>
+              <Link to="/products">{t("general.browseProducts")}</Link>
             </Button>
           </div>
         ) : (
@@ -79,12 +81,12 @@ const Orders = () => {
                 <div className="flex items-center justify-between px-5 py-3 bg-secondary/50 border-b border-border">
                   <div className="flex items-center gap-4">
                     <div>
-                      <p className="text-xs text-muted-foreground">Order</p>
+                      <p className="text-xs text-muted-foreground">{t("general.order")}</p>
                       <p className="text-sm font-semibold">{order.order_number || order.id.slice(0, 8)}</p>
                     </div>
                     <div className="hidden sm:block">
-                      <p className="text-xs text-muted-foreground">Date</p>
-                      <p className="text-sm">{new Date(order.created_at).toLocaleDateString("en-IN", { year: "numeric", month: "short", day: "numeric" })}</p>
+                      <p className="text-xs text-muted-foreground">{t("general.date")}</p>
+                      <p className="text-sm">{new Date(order.created_at).toLocaleDateString("bn-BD", { year: "numeric", month: "short", day: "numeric" })}</p>
                     </div>
                   </div>
                   <Badge className={statusColor[order.status] || statusColor.pending}>
@@ -107,15 +109,15 @@ const Orders = () => {
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium line-clamp-1">{item.product_name}</p>
                         <p className="text-xs text-muted-foreground">
-                          Qty: {item.quantity}
+                          {t("general.qty")}: {item.quantity}
                           {item.size && ` · ${item.size}`}
                           {item.color && ` · ${item.color}`}
-                          {" · "}₹{item.price.toLocaleString()}
+                          {" · "}৳{item.price.toLocaleString()}
                         </p>
                       </div>
                       {item.is_digital && (
                         <Button size="sm" variant="outline" className="rounded-full text-xs gap-1">
-                          <Download className="h-3 w-3" /> Download
+                          <Download className="h-3 w-3" /> {t("general.download")}
                         </Button>
                       )}
                     </div>
@@ -123,10 +125,10 @@ const Orders = () => {
                 </div>
 
                 <div className="flex items-center justify-between px-5 py-3 border-t border-border">
-                  <p className="text-sm font-bold">Total: <span className="text-accent">₹{order.total.toLocaleString()}</span></p>
+                  <p className="text-sm font-bold">{t("general.total")}: <span className="text-accent">৳{order.total.toLocaleString()}</span></p>
                   <div className="flex gap-2">
                     <Button size="sm" variant="ghost" className="text-xs gap-1" asChild>
-                      <Link to="/track-order"><Eye className="h-3 w-3" /> Track</Link>
+                      <Link to="/track-order"><Eye className="h-3 w-3" /> {t("general.track")}</Link>
                     </Button>
                   </div>
                 </div>

@@ -8,19 +8,22 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
+import { useLanguage } from "@/contexts/LanguageContext";
 import type { Tables } from "@/integrations/supabase/types";
-
-const categoryInfo: Record<string, { title: string; description: string; banner: string }> = {
-  shirts: { title: "Shirts", description: "Premium cotton & linen shirts for every occasion", banner: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=1200&h=400&fit=crop" },
-  trousers: { title: "Trousers", description: "Tailored fits from chinos to joggers", banner: "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=1200&h=400&fit=crop" },
-  jackets: { title: "Jackets & Blazers", description: "Statement outerwear for the modern man", banner: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=1200&h=400&fit=crop" },
-  ethnic: { title: "Ethnic Wear", description: "Authentic kurtas and traditional sets", banner: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=1200&h=400&fit=crop" },
-  accessories: { title: "Accessories", description: "Complete your look with premium accessories", banner: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=1200&h=400&fit=crop" },
-  digital: { title: "Digital Products", description: "Style guides, eBooks & exclusive content", banner: "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=1200&h=400&fit=crop" },
-};
 
 const CategoryPage = () => {
   const { slug } = useParams<{ slug: string }>();
+  const { t } = useLanguage();
+
+  const categoryInfo: Record<string, { title: string; description: string; banner: string }> = {
+    shirts: { title: t("cat.shirts"), description: "Premium cotton & linen shirts for every occasion", banner: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=1200&h=400&fit=crop" },
+    trousers: { title: t("cat.trousers"), description: "Tailored fits from chinos to joggers", banner: "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=1200&h=400&fit=crop" },
+    jackets: { title: t("cat.jackets"), description: "Statement outerwear for the modern man", banner: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=1200&h=400&fit=crop" },
+    ethnic: { title: t("cat.ethnic"), description: "Authentic kurtas and traditional sets", banner: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=1200&h=400&fit=crop" },
+    accessories: { title: t("cat.accessories"), description: "Complete your look with premium accessories", banner: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=1200&h=400&fit=crop" },
+    digital: { title: t("cat.digital"), description: "Style guides, eBooks & exclusive content", banner: "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=1200&h=400&fit=crop" },
+  };
+
   const info = categoryInfo[slug || ""] || { title: slug || "Category", description: "", banner: "" };
   const [products, setProducts] = useState<Tables<"products">[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,7 +45,6 @@ const CategoryPage = () => {
 
   return (
     <Layout>
-      {/* Banner */}
       {info.banner && (
         <section className="relative h-48 md:h-64 overflow-hidden">
           <img src={info.banner} alt={info.title} className="w-full h-full object-cover" />
@@ -58,12 +60,12 @@ const CategoryPage = () => {
 
       <div className="container px-4 py-8 md:py-12">
         <div className="text-xs text-muted-foreground mb-6">
-          <Link to="/" className="hover:text-foreground">Home</Link> &nbsp;/&nbsp;
-          <Link to="/products" className="hover:text-foreground">Products</Link> &nbsp;/&nbsp;
+          <Link to="/" className="hover:text-foreground">{t("general.home")}</Link> &nbsp;/&nbsp;
+          <Link to="/products" className="hover:text-foreground">{t("nav.products")}</Link> &nbsp;/&nbsp;
           <span className="text-foreground">{info.title}</span>
         </div>
 
-        <p className="text-sm text-muted-foreground mb-6">{loading ? "Loading..." : `${products.length} products`}</p>
+        <p className="text-sm text-muted-foreground mb-6">{loading ? t("general.loading") : `${products.length} ${t("category.products")}`}</p>
 
         {loading ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-5">
@@ -91,8 +93,8 @@ const CategoryPage = () => {
                     </div>
                     <h3 className="font-medium text-sm line-clamp-1">{product.name}</h3>
                     <div className="flex items-center gap-2 mt-1">
-                      <span className="text-accent font-bold text-sm">₹{product.price.toLocaleString()}</span>
-                      {product.original_price && <span className="text-xs text-muted-foreground line-through">₹{product.original_price.toLocaleString()}</span>}
+                      <span className="text-accent font-bold text-sm">৳{product.price.toLocaleString()}</span>
+                      {product.original_price && <span className="text-xs text-muted-foreground line-through">৳{product.original_price.toLocaleString()}</span>}
                     </div>
                   </Link>
                 </motion.div>
@@ -103,9 +105,9 @@ const CategoryPage = () => {
 
         {!loading && products.length === 0 && (
           <div className="text-center py-20">
-            <p className="text-muted-foreground mb-4">No products in this category yet.</p>
+            <p className="text-muted-foreground mb-4">{t("category.noProducts")}</p>
             <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full" asChild>
-              <Link to="/products">Browse All Products</Link>
+              <Link to="/products">{t("category.browseAll")}</Link>
             </Button>
           </div>
         )}
