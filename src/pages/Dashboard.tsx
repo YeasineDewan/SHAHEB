@@ -197,6 +197,7 @@ function AIStyleRecommendations() {
 
 // ---- Main Dashboard ----
 const Dashboard = () => {
+  const { t } = useLanguage();
   const [tab, setTab] = useState("overview");
   const [invoiceOrder, setInvoiceOrder] = useState<Order | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
