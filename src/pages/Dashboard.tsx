@@ -266,7 +266,7 @@ const Dashboard = () => {
       user_id: userId || null, session_id: userId ? null : sessionId,
     } as any);
     if (error) toast({ title: "Error saving design", variant: "destructive" });
-    else { toast({ title: "Design saved!" }); setDesignForm({ name: "", fabric: "", color: "", style: "", notes: "" }); fetchSavedDesigns(); }
+    else { toast({ title: t("dash.designSaved") }); setDesignForm({ name: "", fabric: "", color: "", style: "", notes: "" }); fetchSavedDesigns(); }
     setSavingDesign(false);
   };
 
