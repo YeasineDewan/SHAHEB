@@ -399,14 +399,14 @@ const Dashboard = () => {
             {/* ---- ORDERS ---- */}
             {tab === "orders" && (
               <div className="space-y-4">
-                <h2 className="font-bold text-lg">My Orders</h2>
+                <h2 className="font-bold text-lg">{t("dash.myOrders")}</h2>
                 {loadingOrders ? (
-                  <div className="flex items-center gap-2 text-muted-foreground text-sm"><Loader2 className="h-4 w-4 animate-spin" /> Loading orders...</div>
+                  <div className="flex items-center gap-2 text-muted-foreground text-sm"><Loader2 className="h-4 w-4 animate-spin" /> {t("dash.loadingOrders")}</div>
                 ) : orders.length === 0 ? (
                   <div className="bg-card border border-border rounded-xl p-8 text-center">
                     <Package className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
-                    <p className="text-muted-foreground text-sm">No orders yet.</p>
-                    <Button asChild className="mt-4 bg-accent text-accent-foreground hover:bg-accent/90 rounded-full"><Link to="/products">Start Shopping</Link></Button>
+                    <p className="text-muted-foreground text-sm">{t("dash.noOrders")}</p>
+                    <Button asChild className="mt-4 bg-accent text-accent-foreground hover:bg-accent/90 rounded-full"><Link to="/products">{t("dash.startShopping")}</Link></Button>
                   </div>
                 ) : orders.map(order => (
                   <div key={order.id} className="bg-card border border-border rounded-xl overflow-hidden">
@@ -425,16 +425,16 @@ const Dashboard = () => {
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium line-clamp-1">{item.name}</p>
-                            <p className="text-xs text-muted-foreground">Qty: {item.qty} · ₹{item.price.toLocaleString()}</p>
+                            <p className="text-xs text-muted-foreground">Qty: {item.qty} · ৳{item.price.toLocaleString()}</p>
                           </div>
                         </div>
                       ))}
                     </div>
                     <div className="flex items-center justify-between px-5 py-3 border-t border-border">
-                      <p className="text-sm font-bold">Total: <span className="text-accent">₹{order.total.toLocaleString()}</span></p>
+                      <p className="text-sm font-bold">Total: <span className="text-accent">৳{order.total.toLocaleString()}</span></p>
                       <div className="flex gap-2">
-                        <Button size="sm" variant="ghost" className="text-xs gap-1" onClick={() => setInvoiceOrder(order)}><Receipt className="h-3 w-3" /> Invoice</Button>
-                        <Button size="sm" variant="ghost" className="text-xs gap-1" asChild><Link to={`/track-order?id=${order.order_number}`}><Truck className="h-3 w-3" /> Track</Link></Button>
+                        <Button size="sm" variant="ghost" className="text-xs gap-1" onClick={() => setInvoiceOrder(order)}><Receipt className="h-3 w-3" /> {t("dash.invoice")}</Button>
+                        <Button size="sm" variant="ghost" className="text-xs gap-1" asChild><Link to={`/track-order?id=${order.order_number}`}><Truck className="h-3 w-3" /> {t("dash.track")}</Link></Button>
                       </div>
                     </div>
                   </div>
@@ -445,25 +445,25 @@ const Dashboard = () => {
             {/* ---- SAVED DESIGNS ---- */}
             {tab === "designs" && (
               <div className="space-y-6">
-                <h2 className="font-bold text-lg">Saved Designs</h2>
+                <h2 className="font-bold text-lg">{t("dash.savedDesigns")}</h2>
                 <div className="bg-card border border-border rounded-xl p-6 space-y-4">
-                  <h3 className="font-semibold text-sm flex items-center gap-2"><PenTool className="h-4 w-4 text-accent" /> Save a New Design Idea</h3>
+                  <h3 className="font-semibold text-sm flex items-center gap-2"><PenTool className="h-4 w-4 text-accent" /> {t("dash.saveNewDesign")}</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2"><Label className="text-xs">Design Name *</Label><Input placeholder="e.g. Wedding Sherwani" value={designForm.name} onChange={e => setDesignForm(f => ({ ...f, name: e.target.value }))} /></div>
-                    <div className="space-y-2"><Label className="text-xs">Fabric</Label><Input placeholder="e.g. Silk, Linen, Cotton" value={designForm.fabric} onChange={e => setDesignForm(f => ({ ...f, fabric: e.target.value }))} /></div>
-                    <div className="space-y-2"><Label className="text-xs">Color Palette</Label><Input placeholder="e.g. Navy & Gold" value={designForm.color} onChange={e => setDesignForm(f => ({ ...f, color: e.target.value }))} /></div>
-                    <div className="space-y-2"><Label className="text-xs">Style</Label><Input placeholder="e.g. Modern Ethnic" value={designForm.style} onChange={e => setDesignForm(f => ({ ...f, style: e.target.value }))} /></div>
+                    <div className="space-y-2"><Label className="text-xs">{t("dash.designName")}</Label><Input placeholder="e.g. Wedding Sherwani" value={designForm.name} onChange={e => setDesignForm(f => ({ ...f, name: e.target.value }))} /></div>
+                    <div className="space-y-2"><Label className="text-xs">{t("dash.fabric")}</Label><Input placeholder="e.g. Silk, Linen, Cotton" value={designForm.fabric} onChange={e => setDesignForm(f => ({ ...f, fabric: e.target.value }))} /></div>
+                    <div className="space-y-2"><Label className="text-xs">{t("dash.colorPalette")}</Label><Input placeholder="e.g. Navy & Gold" value={designForm.color} onChange={e => setDesignForm(f => ({ ...f, color: e.target.value }))} /></div>
+                    <div className="space-y-2"><Label className="text-xs">{t("dash.style")}</Label><Input placeholder="e.g. Modern Ethnic" value={designForm.style} onChange={e => setDesignForm(f => ({ ...f, style: e.target.value }))} /></div>
                   </div>
-                  <div className="space-y-2"><Label className="text-xs">Notes</Label><Textarea placeholder="Describe your vision..." value={designForm.notes} onChange={e => setDesignForm(f => ({ ...f, notes: e.target.value }))} rows={2} /></div>
+                  <div className="space-y-2"><Label className="text-xs">{t("dash.notes")}</Label><Textarea placeholder={t("dash.describeVision")} value={designForm.notes} onChange={e => setDesignForm(f => ({ ...f, notes: e.target.value }))} rows={2} /></div>
                   <Button onClick={handleSaveDesign} disabled={savingDesign} className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full gap-2">
-                    {savingDesign ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} Save Design
+                    {savingDesign ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} {t("dash.saveDesign")}
                   </Button>
                 </div>
 
                 {savedDesigns.length === 0 ? (
                   <div className="bg-card border border-border rounded-xl p-8 text-center">
                     <Palette className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
-                    <p className="text-muted-foreground text-sm">No saved designs yet. Create your first design idea above!</p>
+                    <p className="text-muted-foreground text-sm">{t("dash.noDesigns")}</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -490,44 +490,44 @@ const Dashboard = () => {
             {/* ---- APPOINTMENTS ---- */}
             {tab === "appointments" && (
               <div className="space-y-6">
-                <h2 className="font-bold text-lg">Appointments</h2>
+                <h2 className="font-bold text-lg">{t("dash.appointments")}</h2>
                 <div className="bg-card border border-border rounded-xl p-6 space-y-4">
-                  <h3 className="font-semibold text-sm flex items-center gap-2"><CalendarDays className="h-4 w-4 text-accent" /> Book a Consultation</h3>
+                  <h3 className="font-semibold text-sm flex items-center gap-2"><CalendarDays className="h-4 w-4 text-accent" /> {t("dash.bookConsultation")}</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2"><Label className="text-xs">Your Name *</Label><Input placeholder="Full name" value={apptForm.name} onChange={e => setApptForm(f => ({ ...f, name: e.target.value }))} /></div>
-                    <div className="space-y-2"><Label className="text-xs">Email</Label><Input type="email" placeholder="email@example.com" value={apptForm.email} onChange={e => setApptForm(f => ({ ...f, email: e.target.value }))} /></div>
-                    <div className="space-y-2"><Label className="text-xs">Phone</Label><Input placeholder="+91 ..." value={apptForm.phone} onChange={e => setApptForm(f => ({ ...f, phone: e.target.value }))} /></div>
+                    <div className="space-y-2"><Label className="text-xs">{t("dash.yourName")}</Label><Input placeholder="Full name" value={apptForm.name} onChange={e => setApptForm(f => ({ ...f, name: e.target.value }))} /></div>
+                    <div className="space-y-2"><Label className="text-xs">{t("dash.email")}</Label><Input type="email" placeholder="email@example.com" value={apptForm.email} onChange={e => setApptForm(f => ({ ...f, email: e.target.value }))} /></div>
+                    <div className="space-y-2"><Label className="text-xs">{t("dash.phone")}</Label><Input placeholder="+880 ..." value={apptForm.phone} onChange={e => setApptForm(f => ({ ...f, phone: e.target.value }))} /></div>
                     <div className="space-y-2">
-                      <Label className="text-xs">Type</Label>
+                      <Label className="text-xs">{t("dash.type")}</Label>
                       <Select value={apptForm.appointment_type} onValueChange={v => setApptForm(f => ({ ...f, appointment_type: v }))}>
                         <SelectTrigger className="rounded-lg"><SelectValue /></SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="consultation">Style Consultation</SelectItem>
-                          <SelectItem value="fitting">Custom Fitting</SelectItem>
-                          <SelectItem value="alteration">Alteration</SelectItem>
-                          <SelectItem value="design">Custom Design</SelectItem>
+                          <SelectItem value="consultation">{t("dash.styleConsultation")}</SelectItem>
+                          <SelectItem value="fitting">{t("dash.customFitting")}</SelectItem>
+                          <SelectItem value="alteration">{t("dash.alteration")}</SelectItem>
+                          <SelectItem value="design">{t("dash.customDesign")}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
-                    <div className="space-y-2"><Label className="text-xs">Preferred Date *</Label><Input type="date" value={apptForm.preferred_date} onChange={e => setApptForm(f => ({ ...f, preferred_date: e.target.value }))} /></div>
-                    <div className="space-y-2"><Label className="text-xs">Preferred Time *</Label>
+                    <div className="space-y-2"><Label className="text-xs">{t("dash.preferredDate")}</Label><Input type="date" value={apptForm.preferred_date} onChange={e => setApptForm(f => ({ ...f, preferred_date: e.target.value }))} /></div>
+                    <div className="space-y-2"><Label className="text-xs">{t("dash.preferredTime")}</Label>
                       <Select value={apptForm.preferred_time} onValueChange={v => setApptForm(f => ({ ...f, preferred_time: v }))}>
-                        <SelectTrigger className="rounded-lg"><SelectValue placeholder="Select time" /></SelectTrigger>
+                        <SelectTrigger className="rounded-lg"><SelectValue placeholder={t("dash.selectTime")} /></SelectTrigger>
                         <SelectContent>
-                          {["10:00 AM","11:00 AM","12:00 PM","1:00 PM","2:00 PM","3:00 PM","4:00 PM","5:00 PM","6:00 PM"].map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                          {["10:00 AM","11:00 AM","12:00 PM","1:00 PM","2:00 PM","3:00 PM","4:00 PM","5:00 PM","6:00 PM"].map(time => <SelectItem key={time} value={time}>{time}</SelectItem>)}
                         </SelectContent>
                       </Select>
                     </div>
                   </div>
-                  <div className="space-y-2"><Label className="text-xs">Notes</Label><Textarea placeholder="Anything specific you'd like to discuss..." value={apptForm.notes} onChange={e => setApptForm(f => ({ ...f, notes: e.target.value }))} rows={2} /></div>
+                  <div className="space-y-2"><Label className="text-xs">{t("dash.notes")}</Label><Textarea placeholder={t("dash.describeVision")} value={apptForm.notes} onChange={e => setApptForm(f => ({ ...f, notes: e.target.value }))} rows={2} /></div>
                   <Button onClick={handleBookAppointment} disabled={savingAppt} className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full gap-2">
-                    {savingAppt ? <Loader2 className="h-4 w-4 animate-spin" /> : <Calendar className="h-4 w-4" />} Book Appointment
+                    {savingAppt ? <Loader2 className="h-4 w-4 animate-spin" /> : <Calendar className="h-4 w-4" />} {t("dash.bookAppointment")}
                   </Button>
                 </div>
 
                 {appointments.length > 0 && (
                   <div className="space-y-3">
-                    <h3 className="font-semibold text-sm">Your Appointments</h3>
+                    <h3 className="font-semibold text-sm">{t("dash.yourAppointments")}</h3>
                     {appointments.map((a: any) => (
                       <div key={a.id} className="bg-card border border-border rounded-xl p-5 flex items-center justify-between">
                         <div className="flex items-center gap-3">
@@ -552,27 +552,27 @@ const Dashboard = () => {
             {tab === "wishlist" && (
               <div className="bg-card border border-border rounded-xl p-8 text-center">
                 <Heart className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
-                <p className="text-muted-foreground text-sm">Wishlist feature coming soon.</p>
-                <Button asChild className="mt-4 bg-accent text-accent-foreground hover:bg-accent/90 rounded-full"><Link to="/products">Browse Products</Link></Button>
+                <p className="text-muted-foreground text-sm">{t("dash.wishlistComingSoon")}</p>
+                <Button asChild className="mt-4 bg-accent text-accent-foreground hover:bg-accent/90 rounded-full"><Link to="/products">{t("dash.browseProducts")}</Link></Button>
               </div>
             )}
 
             {/* ---- EDIT PROFILE ---- */}
             {tab === "profile" && (
               <div className="space-y-6">
-                <h2 className="font-bold text-lg">Edit Profile</h2>
+                <h2 className="font-bold text-lg">{t("dash.editProfile")}</h2>
                 <div className="bg-card border border-border rounded-xl p-6 space-y-4">
                   <div className="flex items-center gap-4 mb-2">
                     <Avatar className="h-16 w-16 border-2 border-accent"><AvatarFallback className="bg-accent text-accent-foreground text-xl font-bold">SH</AvatarFallback></Avatar>
-                    <Button variant="outline" className="rounded-full text-xs">Change Photo</Button>
+                    <Button variant="outline" className="rounded-full text-xs">{t("dash.changePhoto")}</Button>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2"><Label className="text-xs">First Name</Label><Input placeholder="First name" /></div>
-                    <div className="space-y-2"><Label className="text-xs">Last Name</Label><Input placeholder="Last name" /></div>
+                    <div className="space-y-2"><Label className="text-xs">{t("dash.firstName")}</Label><Input placeholder={t("dash.firstName")} /></div>
+                    <div className="space-y-2"><Label className="text-xs">{t("dash.lastName")}</Label><Input placeholder={t("dash.lastName")} /></div>
                   </div>
-                  <div className="space-y-2"><Label className="text-xs">Email Address</Label><Input type="email" placeholder="email@example.com" /></div>
-                  <div className="space-y-2"><Label className="text-xs">Phone Number</Label><Input placeholder="+91 ..." /></div>
-                  <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full gap-1" onClick={() => toast({ title: "Profile updated!" })}><Save className="h-4 w-4" /> Save Changes</Button>
+                  <div className="space-y-2"><Label className="text-xs">{t("dash.emailAddress")}</Label><Input type="email" placeholder="email@example.com" /></div>
+                  <div className="space-y-2"><Label className="text-xs">{t("dash.phoneNumber")}</Label><Input placeholder="+880 ..." /></div>
+                  <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full gap-1" onClick={() => toast({ title: t("dash.profileUpdated") })}><Save className="h-4 w-4" /> {t("dash.saveChanges")}</Button>
                 </div>
               </div>
             )}
@@ -580,13 +580,13 @@ const Dashboard = () => {
             {/* ---- SETTINGS ---- */}
             {tab === "settings" && (
               <div className="space-y-6">
-                <h2 className="font-bold text-lg">Account Settings</h2>
+                <h2 className="font-bold text-lg">{t("dash.accountSettings")}</h2>
                 <div className="bg-card border border-border rounded-xl p-6 space-y-4">
-                  <h3 className="font-semibold text-sm flex items-center gap-2"><Bell className="h-4 w-4 text-accent" /> Notifications</h3>
+                  <h3 className="font-semibold text-sm flex items-center gap-2"><Bell className="h-4 w-4 text-accent" /> {t("dash.notifications")}</h3>
                   {[
-                    { label: "Order status updates", desc: "Get notified when your order ships or is delivered" },
-                    { label: "Promotions & deals", desc: "Receive exclusive offers and discounts" },
-                    { label: "New arrivals", desc: "Be the first to know about new products" },
+                    { label: t("dash.orderStatusUpdates"), desc: t("dash.orderStatusDesc") },
+                    { label: t("dash.promotions"), desc: t("dash.promotionsDesc") },
+                    { label: t("dash.newArrivals"), desc: t("dash.newArrivalsDesc") },
                   ].map(pref => (
                     <div key={pref.label} className="flex items-center justify-between py-1">
                       <div><span className="text-sm">{pref.label}</span><p className="text-[10px] text-muted-foreground">{pref.desc}</p></div>
@@ -595,7 +595,7 @@ const Dashboard = () => {
                   ))}
                 </div>
                 <Separator />
-                <Button variant="destructive" className="rounded-full text-xs gap-1"><LogOut className="h-3.5 w-3.5" /> Delete Account</Button>
+                <Button variant="destructive" className="rounded-full text-xs gap-1"><LogOut className="h-3.5 w-3.5" /> {t("dash.deleteAccount")}</Button>
               </div>
             )}
           </div>
