@@ -342,10 +342,10 @@ const Dashboard = () => {
               <div className="space-y-6">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   {[
-                    { label: "Total Orders", value: String(orders.length), icon: Package },
-                    { label: "Total Spent", value: `₹${totalSpent.toLocaleString()}`, icon: CreditCard },
-                    { label: "Saved Designs", value: `${savedDesigns.length}`, icon: PenTool },
-                    { label: "Appointments", value: `${appointments.length}`, icon: CalendarDays },
+                    { label: t("dash.totalOrders"), value: String(orders.length), icon: Package },
+                    { label: t("dash.totalSpent"), value: `৳${totalSpent.toLocaleString()}`, icon: CreditCard },
+                    { label: t("dash.savedDesigns"), value: `${savedDesigns.length}`, icon: PenTool },
+                    { label: t("dash.appointments"), value: `${appointments.length}`, icon: CalendarDays },
                   ].map(s => (
                     <div key={s.label} className="bg-card border border-border rounded-xl p-4">
                       <div className="flex items-center gap-2 mb-2"><div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center"><s.icon className="h-4 w-4 text-accent" /></div></div>
@@ -358,8 +358,8 @@ const Dashboard = () => {
                 {orders.length > 0 && (
                   <div className="bg-card border border-border rounded-xl">
                     <div className="flex items-center justify-between px-5 py-3 border-b border-border">
-                      <h3 className="font-semibold text-sm">Recent Orders</h3>
-                      <Button variant="ghost" size="sm" className="text-xs text-accent" onClick={() => setTab("orders")}>View All</Button>
+                      <h3 className="font-semibold text-sm">{t("dash.recentOrders")}</h3>
+                      <Button variant="ghost" size="sm" className="text-xs text-accent" onClick={() => setTab("orders")}>{t("dash.viewAll")}</Button>
                     </div>
                     <div className="divide-y divide-border">
                       {orders.slice(0, 3).map(order => (
@@ -367,7 +367,7 @@ const Dashboard = () => {
                           <div><p className="text-sm font-medium">{order.order_number}</p><p className="text-xs text-muted-foreground">{order.date} · {order.items.length} items</p></div>
                           <div className="flex items-center gap-2">
                             <Badge className={statusColor[order.status] || "bg-secondary"} variant="outline">{order.status}</Badge>
-                            <span className="text-sm font-bold">₹{order.total.toLocaleString()}</span>
+                            <span className="text-sm font-bold">৳{order.total.toLocaleString()}</span>
                           </div>
                         </div>
                       ))}
@@ -379,18 +379,18 @@ const Dashboard = () => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   <button onClick={() => setTab("ai-stylist")} className="bg-gradient-to-br from-accent/10 to-accent/5 border border-accent/20 rounded-xl p-5 text-left hover:border-accent/40 transition-colors">
                     <Sparkles className="h-6 w-6 text-accent mb-2" />
-                    <h3 className="font-semibold text-sm">AI Style Advisor</h3>
-                    <p className="text-xs text-muted-foreground mt-1">Get personalized recommendations</p>
+                    <h3 className="font-semibold text-sm">{t("dash.aiStyleAdvisor")}</h3>
+                    <p className="text-xs text-muted-foreground mt-1">{t("dash.aiStyleDesc")}</p>
                   </button>
                   <button onClick={() => setTab("designs")} className="bg-card border border-border rounded-xl p-5 text-left hover:border-accent/40 transition-colors">
                     <PenTool className="h-6 w-6 text-accent mb-2" />
-                    <h3 className="font-semibold text-sm">Saved Designs</h3>
-                    <p className="text-xs text-muted-foreground mt-1">View your custom design ideas</p>
+                    <h3 className="font-semibold text-sm">{t("dash.savedDesigns")}</h3>
+                    <p className="text-xs text-muted-foreground mt-1">{t("dash.savedDesignsDesc")}</p>
                   </button>
                   <button onClick={() => setTab("appointments")} className="bg-card border border-border rounded-xl p-5 text-left hover:border-accent/40 transition-colors">
                     <CalendarDays className="h-6 w-6 text-accent mb-2" />
-                    <h3 className="font-semibold text-sm">Book Appointment</h3>
-                    <p className="text-xs text-muted-foreground mt-1">Schedule a styling consultation</p>
+                    <h3 className="font-semibold text-sm">{t("dash.bookAppointment")}</h3>
+                    <p className="text-xs text-muted-foreground mt-1">{t("dash.bookAppointmentDesc")}</p>
                   </button>
                 </div>
               </div>
