@@ -20,6 +20,7 @@ import {
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import logoImg from "@/assets/logo.png";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // ---- Session ID for guest users ----
 function getSessionId() {
@@ -75,6 +76,7 @@ function InvoiceModal({ order, onClose }: { order: Order; onClose: () => void })
 
 // ---- AI Style Recommendations Component ----
 function AIStyleRecommendations() {
+  const { t } = useLanguage();
   const [bodyType, setBodyType] = useState("");
   const [preferences, setPreferences] = useState("");
   const [occasion, setOccasion] = useState("");
@@ -84,7 +86,7 @@ function AIStyleRecommendations() {
   const resultRef = useRef<HTMLDivElement>(null);
 
   const getRecommendations = async () => {
-    if (!bodyType) { toast({ title: "Please select your body type" }); return; }
+    if (!bodyType) { toast({ title: t("ai.selectBodyType") }); return; }
     setLoading(true);
     setResult("");
     try {
@@ -126,66 +128,66 @@ function AIStyleRecommendations() {
     <div className="space-y-6">
       <div className="flex items-center gap-3 mb-2">
         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5 flex items-center justify-center"><Sparkles className="h-5 w-5 text-accent" /></div>
-        <div><h2 className="font-bold text-lg">AI Style Advisor</h2><p className="text-xs text-muted-foreground">Get personalized fabric, color & style recommendations</p></div>
+        <div><h2 className="font-bold text-lg">{t("ai.title")}</h2><p className="text-xs text-muted-foreground">{t("ai.desc")}</p></div>
       </div>
 
       <div className="bg-card border border-border rounded-xl p-6 space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label className="text-xs font-medium">Body Type</Label>
+            <Label className="text-xs font-medium">{t("ai.bodyType")}</Label>
             <Select value={bodyType} onValueChange={setBodyType}>
-              <SelectTrigger className="rounded-lg"><SelectValue placeholder="Select body type" /></SelectTrigger>
+              <SelectTrigger className="rounded-lg"><SelectValue placeholder={t("ai.selectBodyType")} /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="slim">Slim / Lean</SelectItem>
-                <SelectItem value="athletic">Athletic / Muscular</SelectItem>
-                <SelectItem value="average">Average / Medium</SelectItem>
-                <SelectItem value="broad">Broad / Stocky</SelectItem>
-                <SelectItem value="tall-slim">Tall & Slim</SelectItem>
-                <SelectItem value="plus">Plus Size</SelectItem>
+                <SelectItem value="slim">{t("ai.slim")}</SelectItem>
+                <SelectItem value="athletic">{t("ai.athletic")}</SelectItem>
+                <SelectItem value="average">{t("ai.average")}</SelectItem>
+                <SelectItem value="broad">{t("ai.broad")}</SelectItem>
+                <SelectItem value="tall-slim">{t("ai.tallSlim")}</SelectItem>
+                <SelectItem value="plus">{t("ai.plus")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div className="space-y-2">
-            <Label className="text-xs font-medium">Occasion</Label>
+            <Label className="text-xs font-medium">{t("ai.occasion")}</Label>
             <Select value={occasion} onValueChange={setOccasion}>
-              <SelectTrigger className="rounded-lg"><SelectValue placeholder="What's the occasion?" /></SelectTrigger>
+              <SelectTrigger className="rounded-lg"><SelectValue placeholder={t("ai.occasionPlaceholder")} /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="casual">Casual / Everyday</SelectItem>
-                <SelectItem value="formal">Formal / Business</SelectItem>
-                <SelectItem value="wedding">Wedding / Festive</SelectItem>
-                <SelectItem value="party">Party / Night Out</SelectItem>
-                <SelectItem value="date">Date Night</SelectItem>
-                <SelectItem value="interview">Job Interview</SelectItem>
+                <SelectItem value="casual">{t("ai.casual")}</SelectItem>
+                <SelectItem value="formal">{t("ai.formal")}</SelectItem>
+                <SelectItem value="wedding">{t("ai.wedding")}</SelectItem>
+                <SelectItem value="party">{t("ai.party")}</SelectItem>
+                <SelectItem value="date">{t("ai.dateNight")}</SelectItem>
+                <SelectItem value="interview">{t("ai.interview")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div className="space-y-2">
-            <Label className="text-xs font-medium">Budget Range</Label>
+            <Label className="text-xs font-medium">{t("ai.budget")}</Label>
             <Select value={budget} onValueChange={setBudget}>
-              <SelectTrigger className="rounded-lg"><SelectValue placeholder="Select budget" /></SelectTrigger>
+              <SelectTrigger className="rounded-lg"><SelectValue placeholder={t("ai.selectBudget")} /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="under-2000">Under ₹2,000</SelectItem>
-                <SelectItem value="2000-5000">₹2,000 – ₹5,000</SelectItem>
-                <SelectItem value="5000-10000">₹5,000 – ₹10,000</SelectItem>
-                <SelectItem value="10000-plus">₹10,000+</SelectItem>
-                <SelectItem value="flexible">Flexible</SelectItem>
+                <SelectItem value="under-2000">৳২,০০০ এর নিচে</SelectItem>
+                <SelectItem value="2000-5000">৳২,০০০ – ৳৫,০০০</SelectItem>
+                <SelectItem value="5000-10000">৳৫,০০০ – ৳১০,০০০</SelectItem>
+                <SelectItem value="10000-plus">৳১০,০০০+</SelectItem>
+                <SelectItem value="flexible">{t("ai.flexible")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div className="space-y-2">
-            <Label className="text-xs font-medium">Style Preferences</Label>
-            <Input placeholder="e.g. minimalist, bold colors, classic..." value={preferences} onChange={e => setPreferences(e.target.value)} className="rounded-lg" />
+            <Label className="text-xs font-medium">{t("ai.preferences")}</Label>
+            <Input placeholder={t("ai.prefPlaceholder")} value={preferences} onChange={e => setPreferences(e.target.value)} className="rounded-lg" />
           </div>
         </div>
         <Button onClick={getRecommendations} disabled={loading} className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full gap-2">
           {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
-          {loading ? "Generating..." : "Get AI Recommendations"}
+          {loading ? t("ai.generating") : t("ai.getRecommendations")}
         </Button>
       </div>
 
       {result && (
         <div ref={resultRef} className="bg-card border border-border rounded-xl p-6 prose prose-sm dark:prose-invert max-w-none">
-          <div className="flex items-center gap-2 mb-4"><Sparkles className="h-4 w-4 text-accent" /><span className="font-semibold text-sm text-accent">AI Recommendations</span></div>
+          <div className="flex items-center gap-2 mb-4"><Sparkles className="h-4 w-4 text-accent" /><span className="font-semibold text-sm text-accent">{t("ai.recommendations")}</span></div>
           <div className="whitespace-pre-wrap text-sm leading-relaxed">{result}</div>
         </div>
       )}
@@ -195,6 +197,7 @@ function AIStyleRecommendations() {
 
 // ---- Main Dashboard ----
 const Dashboard = () => {
+  const { t } = useLanguage();
   const [tab, setTab] = useState("overview");
   const [invoiceOrder, setInvoiceOrder] = useState<Order | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
@@ -254,7 +257,7 @@ const Dashboard = () => {
   };
 
   const handleSaveDesign = async () => {
-    if (!designForm.name) { toast({ title: "Please enter a design name" }); return; }
+    if (!designForm.name) { toast({ title: t("dash.designName") }); return; }
     setSavingDesign(true);
     const { data: session } = await supabase.auth.getSession();
     const userId = session?.session?.user?.id;
@@ -263,18 +266,18 @@ const Dashboard = () => {
       user_id: userId || null, session_id: userId ? null : sessionId,
     } as any);
     if (error) toast({ title: "Error saving design", variant: "destructive" });
-    else { toast({ title: "Design saved!" }); setDesignForm({ name: "", fabric: "", color: "", style: "", notes: "" }); fetchSavedDesigns(); }
+    else { toast({ title: t("dash.designSaved") }); setDesignForm({ name: "", fabric: "", color: "", style: "", notes: "" }); fetchSavedDesigns(); }
     setSavingDesign(false);
   };
 
   const handleDeleteDesign = async (id: string) => {
     await supabase.from("saved_designs" as any).delete().eq("id", id);
     fetchSavedDesigns();
-    toast({ title: "Design removed" });
+    toast({ title: t("dash.designRemoved") });
   };
 
   const handleBookAppointment = async () => {
-    if (!apptForm.name || !apptForm.preferred_date || !apptForm.preferred_time) { toast({ title: "Please fill required fields" }); return; }
+    if (!apptForm.name || !apptForm.preferred_date || !apptForm.preferred_time) { toast({ title: t("dash.fillRequired") }); return; }
     setSavingAppt(true);
     const { data: session } = await supabase.auth.getSession();
     const userId = session?.session?.user?.id;
@@ -282,21 +285,21 @@ const Dashboard = () => {
       ...apptForm, user_id: userId || null, session_id: userId ? null : sessionId,
     } as any);
     if (error) toast({ title: "Error booking appointment", variant: "destructive" });
-    else { toast({ title: "Appointment booked!" }); setApptForm({ name: "", email: "", phone: "", appointment_type: "consultation", preferred_date: "", preferred_time: "", notes: "" }); fetchAppointments(); }
+    else { toast({ title: t("dash.appointmentBooked") }); setApptForm({ name: "", email: "", phone: "", appointment_type: "consultation", preferred_date: "", preferred_time: "", notes: "" }); fetchAppointments(); }
     setSavingAppt(false);
   };
 
   const totalSpent = orders.reduce((s, o) => s + o.total, 0);
 
   const sidebarItems = [
-    { id: "overview", icon: User, label: "Overview" },
-    { id: "orders", icon: Package, label: "My Orders" },
-    { id: "designs", icon: PenTool, label: "Saved Designs" },
-    { id: "appointments", icon: CalendarDays, label: "Appointments" },
-    { id: "ai-stylist", icon: Sparkles, label: "AI Stylist" },
-    { id: "wishlist", icon: Heart, label: "Wishlist" },
-    { id: "profile", icon: Edit, label: "Edit Profile" },
-    { id: "settings", icon: Settings, label: "Settings" },
+    { id: "overview", icon: User, label: t("dash.overview") },
+    { id: "orders", icon: Package, label: t("dash.myOrders") },
+    { id: "designs", icon: PenTool, label: t("dash.savedDesigns") },
+    { id: "appointments", icon: CalendarDays, label: t("dash.appointments") },
+    { id: "ai-stylist", icon: Sparkles, label: t("dash.aiStylist") },
+    { id: "wishlist", icon: Heart, label: t("dash.wishlist") },
+    { id: "profile", icon: Edit, label: t("dash.editProfile") },
+    { id: "settings", icon: Settings, label: t("dash.settings") },
   ];
 
   return (
@@ -306,11 +309,11 @@ const Dashboard = () => {
         <div className="flex items-center gap-4 mb-8">
           <Avatar className="h-14 w-14 border-2 border-accent"><AvatarFallback className="bg-accent text-accent-foreground text-lg font-bold">SH</AvatarFallback></Avatar>
           <div className="flex-1">
-            <h1 className="text-xl md:text-2xl font-bold">Welcome to SHAHEB</h1>
-            <p className="text-sm text-muted-foreground">Your personal style dashboard</p>
+            <h1 className="text-xl md:text-2xl font-bold">{t("dash.welcome")}</h1>
+            <p className="text-sm text-muted-foreground">{t("dash.subtitle")}</p>
           </div>
           <Button variant="outline" className="rounded-full text-xs hidden md:flex gap-1.5" asChild>
-            <Link to="/track-order"><Truck className="h-3.5 w-3.5" /> Track Order</Link>
+            <Link to="/track-order"><Truck className="h-3.5 w-3.5" /> {t("dash.trackOrder")}</Link>
           </Button>
         </div>
 
@@ -326,7 +329,7 @@ const Dashboard = () => {
               ))}
               <Separator className="my-2" />
               <button className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm text-destructive hover:bg-destructive/10 transition-colors">
-                <LogOut className="h-4 w-4" /> Sign Out
+                <LogOut className="h-4 w-4" /> {t("dash.signOut")}
               </button>
             </nav>
           </div>
@@ -339,10 +342,10 @@ const Dashboard = () => {
               <div className="space-y-6">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   {[
-                    { label: "Total Orders", value: String(orders.length), icon: Package },
-                    { label: "Total Spent", value: `₹${totalSpent.toLocaleString()}`, icon: CreditCard },
-                    { label: "Saved Designs", value: `${savedDesigns.length}`, icon: PenTool },
-                    { label: "Appointments", value: `${appointments.length}`, icon: CalendarDays },
+                    { label: t("dash.totalOrders"), value: String(orders.length), icon: Package },
+                    { label: t("dash.totalSpent"), value: `৳${totalSpent.toLocaleString()}`, icon: CreditCard },
+                    { label: t("dash.savedDesigns"), value: `${savedDesigns.length}`, icon: PenTool },
+                    { label: t("dash.appointments"), value: `${appointments.length}`, icon: CalendarDays },
                   ].map(s => (
                     <div key={s.label} className="bg-card border border-border rounded-xl p-4">
                       <div className="flex items-center gap-2 mb-2"><div className="w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center"><s.icon className="h-4 w-4 text-accent" /></div></div>
@@ -355,8 +358,8 @@ const Dashboard = () => {
                 {orders.length > 0 && (
                   <div className="bg-card border border-border rounded-xl">
                     <div className="flex items-center justify-between px-5 py-3 border-b border-border">
-                      <h3 className="font-semibold text-sm">Recent Orders</h3>
-                      <Button variant="ghost" size="sm" className="text-xs text-accent" onClick={() => setTab("orders")}>View All</Button>
+                      <h3 className="font-semibold text-sm">{t("dash.recentOrders")}</h3>
+                      <Button variant="ghost" size="sm" className="text-xs text-accent" onClick={() => setTab("orders")}>{t("dash.viewAll")}</Button>
                     </div>
                     <div className="divide-y divide-border">
                       {orders.slice(0, 3).map(order => (
@@ -364,7 +367,7 @@ const Dashboard = () => {
                           <div><p className="text-sm font-medium">{order.order_number}</p><p className="text-xs text-muted-foreground">{order.date} · {order.items.length} items</p></div>
                           <div className="flex items-center gap-2">
                             <Badge className={statusColor[order.status] || "bg-secondary"} variant="outline">{order.status}</Badge>
-                            <span className="text-sm font-bold">₹{order.total.toLocaleString()}</span>
+                            <span className="text-sm font-bold">৳{order.total.toLocaleString()}</span>
                           </div>
                         </div>
                       ))}
@@ -376,18 +379,18 @@ const Dashboard = () => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   <button onClick={() => setTab("ai-stylist")} className="bg-gradient-to-br from-accent/10 to-accent/5 border border-accent/20 rounded-xl p-5 text-left hover:border-accent/40 transition-colors">
                     <Sparkles className="h-6 w-6 text-accent mb-2" />
-                    <h3 className="font-semibold text-sm">AI Style Advisor</h3>
-                    <p className="text-xs text-muted-foreground mt-1">Get personalized recommendations</p>
+                    <h3 className="font-semibold text-sm">{t("dash.aiStyleAdvisor")}</h3>
+                    <p className="text-xs text-muted-foreground mt-1">{t("dash.aiStyleDesc")}</p>
                   </button>
                   <button onClick={() => setTab("designs")} className="bg-card border border-border rounded-xl p-5 text-left hover:border-accent/40 transition-colors">
                     <PenTool className="h-6 w-6 text-accent mb-2" />
-                    <h3 className="font-semibold text-sm">Saved Designs</h3>
-                    <p className="text-xs text-muted-foreground mt-1">View your custom design ideas</p>
+                    <h3 className="font-semibold text-sm">{t("dash.savedDesigns")}</h3>
+                    <p className="text-xs text-muted-foreground mt-1">{t("dash.savedDesignsDesc")}</p>
                   </button>
                   <button onClick={() => setTab("appointments")} className="bg-card border border-border rounded-xl p-5 text-left hover:border-accent/40 transition-colors">
                     <CalendarDays className="h-6 w-6 text-accent mb-2" />
-                    <h3 className="font-semibold text-sm">Book Appointment</h3>
-                    <p className="text-xs text-muted-foreground mt-1">Schedule a styling consultation</p>
+                    <h3 className="font-semibold text-sm">{t("dash.bookAppointment")}</h3>
+                    <p className="text-xs text-muted-foreground mt-1">{t("dash.bookAppointmentDesc")}</p>
                   </button>
                 </div>
               </div>
@@ -396,14 +399,14 @@ const Dashboard = () => {
             {/* ---- ORDERS ---- */}
             {tab === "orders" && (
               <div className="space-y-4">
-                <h2 className="font-bold text-lg">My Orders</h2>
+                <h2 className="font-bold text-lg">{t("dash.myOrders")}</h2>
                 {loadingOrders ? (
-                  <div className="flex items-center gap-2 text-muted-foreground text-sm"><Loader2 className="h-4 w-4 animate-spin" /> Loading orders...</div>
+                  <div className="flex items-center gap-2 text-muted-foreground text-sm"><Loader2 className="h-4 w-4 animate-spin" /> {t("dash.loadingOrders")}</div>
                 ) : orders.length === 0 ? (
                   <div className="bg-card border border-border rounded-xl p-8 text-center">
                     <Package className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
-                    <p className="text-muted-foreground text-sm">No orders yet.</p>
-                    <Button asChild className="mt-4 bg-accent text-accent-foreground hover:bg-accent/90 rounded-full"><Link to="/products">Start Shopping</Link></Button>
+                    <p className="text-muted-foreground text-sm">{t("dash.noOrders")}</p>
+                    <Button asChild className="mt-4 bg-accent text-accent-foreground hover:bg-accent/90 rounded-full"><Link to="/products">{t("dash.startShopping")}</Link></Button>
                   </div>
                 ) : orders.map(order => (
                   <div key={order.id} className="bg-card border border-border rounded-xl overflow-hidden">
@@ -422,16 +425,16 @@ const Dashboard = () => {
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium line-clamp-1">{item.name}</p>
-                            <p className="text-xs text-muted-foreground">Qty: {item.qty} · ₹{item.price.toLocaleString()}</p>
+                            <p className="text-xs text-muted-foreground">Qty: {item.qty} · ৳{item.price.toLocaleString()}</p>
                           </div>
                         </div>
                       ))}
                     </div>
                     <div className="flex items-center justify-between px-5 py-3 border-t border-border">
-                      <p className="text-sm font-bold">Total: <span className="text-accent">₹{order.total.toLocaleString()}</span></p>
+                      <p className="text-sm font-bold">Total: <span className="text-accent">৳{order.total.toLocaleString()}</span></p>
                       <div className="flex gap-2">
-                        <Button size="sm" variant="ghost" className="text-xs gap-1" onClick={() => setInvoiceOrder(order)}><Receipt className="h-3 w-3" /> Invoice</Button>
-                        <Button size="sm" variant="ghost" className="text-xs gap-1" asChild><Link to={`/track-order?id=${order.order_number}`}><Truck className="h-3 w-3" /> Track</Link></Button>
+                        <Button size="sm" variant="ghost" className="text-xs gap-1" onClick={() => setInvoiceOrder(order)}><Receipt className="h-3 w-3" /> {t("dash.invoice")}</Button>
+                        <Button size="sm" variant="ghost" className="text-xs gap-1" asChild><Link to={`/track-order?id=${order.order_number}`}><Truck className="h-3 w-3" /> {t("dash.track")}</Link></Button>
                       </div>
                     </div>
                   </div>
@@ -442,25 +445,25 @@ const Dashboard = () => {
             {/* ---- SAVED DESIGNS ---- */}
             {tab === "designs" && (
               <div className="space-y-6">
-                <h2 className="font-bold text-lg">Saved Designs</h2>
+                <h2 className="font-bold text-lg">{t("dash.savedDesigns")}</h2>
                 <div className="bg-card border border-border rounded-xl p-6 space-y-4">
-                  <h3 className="font-semibold text-sm flex items-center gap-2"><PenTool className="h-4 w-4 text-accent" /> Save a New Design Idea</h3>
+                  <h3 className="font-semibold text-sm flex items-center gap-2"><PenTool className="h-4 w-4 text-accent" /> {t("dash.saveNewDesign")}</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2"><Label className="text-xs">Design Name *</Label><Input placeholder="e.g. Wedding Sherwani" value={designForm.name} onChange={e => setDesignForm(f => ({ ...f, name: e.target.value }))} /></div>
-                    <div className="space-y-2"><Label className="text-xs">Fabric</Label><Input placeholder="e.g. Silk, Linen, Cotton" value={designForm.fabric} onChange={e => setDesignForm(f => ({ ...f, fabric: e.target.value }))} /></div>
-                    <div className="space-y-2"><Label className="text-xs">Color Palette</Label><Input placeholder="e.g. Navy & Gold" value={designForm.color} onChange={e => setDesignForm(f => ({ ...f, color: e.target.value }))} /></div>
-                    <div className="space-y-2"><Label className="text-xs">Style</Label><Input placeholder="e.g. Modern Ethnic" value={designForm.style} onChange={e => setDesignForm(f => ({ ...f, style: e.target.value }))} /></div>
+                    <div className="space-y-2"><Label className="text-xs">{t("dash.designName")}</Label><Input placeholder="e.g. Wedding Sherwani" value={designForm.name} onChange={e => setDesignForm(f => ({ ...f, name: e.target.value }))} /></div>
+                    <div className="space-y-2"><Label className="text-xs">{t("dash.fabric")}</Label><Input placeholder="e.g. Silk, Linen, Cotton" value={designForm.fabric} onChange={e => setDesignForm(f => ({ ...f, fabric: e.target.value }))} /></div>
+                    <div className="space-y-2"><Label className="text-xs">{t("dash.colorPalette")}</Label><Input placeholder="e.g. Navy & Gold" value={designForm.color} onChange={e => setDesignForm(f => ({ ...f, color: e.target.value }))} /></div>
+                    <div className="space-y-2"><Label className="text-xs">{t("dash.style")}</Label><Input placeholder="e.g. Modern Ethnic" value={designForm.style} onChange={e => setDesignForm(f => ({ ...f, style: e.target.value }))} /></div>
                   </div>
-                  <div className="space-y-2"><Label className="text-xs">Notes</Label><Textarea placeholder="Describe your vision..." value={designForm.notes} onChange={e => setDesignForm(f => ({ ...f, notes: e.target.value }))} rows={2} /></div>
+                  <div className="space-y-2"><Label className="text-xs">{t("dash.notes")}</Label><Textarea placeholder={t("dash.describeVision")} value={designForm.notes} onChange={e => setDesignForm(f => ({ ...f, notes: e.target.value }))} rows={2} /></div>
                   <Button onClick={handleSaveDesign} disabled={savingDesign} className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full gap-2">
-                    {savingDesign ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} Save Design
+                    {savingDesign ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} {t("dash.saveDesign")}
                   </Button>
                 </div>
 
                 {savedDesigns.length === 0 ? (
                   <div className="bg-card border border-border rounded-xl p-8 text-center">
                     <Palette className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
-                    <p className="text-muted-foreground text-sm">No saved designs yet. Create your first design idea above!</p>
+                    <p className="text-muted-foreground text-sm">{t("dash.noDesigns")}</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -487,44 +490,44 @@ const Dashboard = () => {
             {/* ---- APPOINTMENTS ---- */}
             {tab === "appointments" && (
               <div className="space-y-6">
-                <h2 className="font-bold text-lg">Appointments</h2>
+                <h2 className="font-bold text-lg">{t("dash.appointments")}</h2>
                 <div className="bg-card border border-border rounded-xl p-6 space-y-4">
-                  <h3 className="font-semibold text-sm flex items-center gap-2"><CalendarDays className="h-4 w-4 text-accent" /> Book a Consultation</h3>
+                  <h3 className="font-semibold text-sm flex items-center gap-2"><CalendarDays className="h-4 w-4 text-accent" /> {t("dash.bookConsultation")}</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2"><Label className="text-xs">Your Name *</Label><Input placeholder="Full name" value={apptForm.name} onChange={e => setApptForm(f => ({ ...f, name: e.target.value }))} /></div>
-                    <div className="space-y-2"><Label className="text-xs">Email</Label><Input type="email" placeholder="email@example.com" value={apptForm.email} onChange={e => setApptForm(f => ({ ...f, email: e.target.value }))} /></div>
-                    <div className="space-y-2"><Label className="text-xs">Phone</Label><Input placeholder="+91 ..." value={apptForm.phone} onChange={e => setApptForm(f => ({ ...f, phone: e.target.value }))} /></div>
+                    <div className="space-y-2"><Label className="text-xs">{t("dash.yourName")}</Label><Input placeholder="Full name" value={apptForm.name} onChange={e => setApptForm(f => ({ ...f, name: e.target.value }))} /></div>
+                    <div className="space-y-2"><Label className="text-xs">{t("dash.email")}</Label><Input type="email" placeholder="email@example.com" value={apptForm.email} onChange={e => setApptForm(f => ({ ...f, email: e.target.value }))} /></div>
+                    <div className="space-y-2"><Label className="text-xs">{t("dash.phone")}</Label><Input placeholder="+880 ..." value={apptForm.phone} onChange={e => setApptForm(f => ({ ...f, phone: e.target.value }))} /></div>
                     <div className="space-y-2">
-                      <Label className="text-xs">Type</Label>
+                      <Label className="text-xs">{t("dash.type")}</Label>
                       <Select value={apptForm.appointment_type} onValueChange={v => setApptForm(f => ({ ...f, appointment_type: v }))}>
                         <SelectTrigger className="rounded-lg"><SelectValue /></SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="consultation">Style Consultation</SelectItem>
-                          <SelectItem value="fitting">Custom Fitting</SelectItem>
-                          <SelectItem value="alteration">Alteration</SelectItem>
-                          <SelectItem value="design">Custom Design</SelectItem>
+                          <SelectItem value="consultation">{t("dash.styleConsultation")}</SelectItem>
+                          <SelectItem value="fitting">{t("dash.customFitting")}</SelectItem>
+                          <SelectItem value="alteration">{t("dash.alteration")}</SelectItem>
+                          <SelectItem value="design">{t("dash.customDesign")}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
-                    <div className="space-y-2"><Label className="text-xs">Preferred Date *</Label><Input type="date" value={apptForm.preferred_date} onChange={e => setApptForm(f => ({ ...f, preferred_date: e.target.value }))} /></div>
-                    <div className="space-y-2"><Label className="text-xs">Preferred Time *</Label>
+                    <div className="space-y-2"><Label className="text-xs">{t("dash.preferredDate")}</Label><Input type="date" value={apptForm.preferred_date} onChange={e => setApptForm(f => ({ ...f, preferred_date: e.target.value }))} /></div>
+                    <div className="space-y-2"><Label className="text-xs">{t("dash.preferredTime")}</Label>
                       <Select value={apptForm.preferred_time} onValueChange={v => setApptForm(f => ({ ...f, preferred_time: v }))}>
-                        <SelectTrigger className="rounded-lg"><SelectValue placeholder="Select time" /></SelectTrigger>
+                        <SelectTrigger className="rounded-lg"><SelectValue placeholder={t("dash.selectTime")} /></SelectTrigger>
                         <SelectContent>
-                          {["10:00 AM","11:00 AM","12:00 PM","1:00 PM","2:00 PM","3:00 PM","4:00 PM","5:00 PM","6:00 PM"].map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                          {["10:00 AM","11:00 AM","12:00 PM","1:00 PM","2:00 PM","3:00 PM","4:00 PM","5:00 PM","6:00 PM"].map(time => <SelectItem key={time} value={time}>{time}</SelectItem>)}
                         </SelectContent>
                       </Select>
                     </div>
                   </div>
-                  <div className="space-y-2"><Label className="text-xs">Notes</Label><Textarea placeholder="Anything specific you'd like to discuss..." value={apptForm.notes} onChange={e => setApptForm(f => ({ ...f, notes: e.target.value }))} rows={2} /></div>
+                  <div className="space-y-2"><Label className="text-xs">{t("dash.notes")}</Label><Textarea placeholder={t("dash.describeVision")} value={apptForm.notes} onChange={e => setApptForm(f => ({ ...f, notes: e.target.value }))} rows={2} /></div>
                   <Button onClick={handleBookAppointment} disabled={savingAppt} className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full gap-2">
-                    {savingAppt ? <Loader2 className="h-4 w-4 animate-spin" /> : <Calendar className="h-4 w-4" />} Book Appointment
+                    {savingAppt ? <Loader2 className="h-4 w-4 animate-spin" /> : <Calendar className="h-4 w-4" />} {t("dash.bookAppointment")}
                   </Button>
                 </div>
 
                 {appointments.length > 0 && (
                   <div className="space-y-3">
-                    <h3 className="font-semibold text-sm">Your Appointments</h3>
+                    <h3 className="font-semibold text-sm">{t("dash.yourAppointments")}</h3>
                     {appointments.map((a: any) => (
                       <div key={a.id} className="bg-card border border-border rounded-xl p-5 flex items-center justify-between">
                         <div className="flex items-center gap-3">
@@ -549,27 +552,27 @@ const Dashboard = () => {
             {tab === "wishlist" && (
               <div className="bg-card border border-border rounded-xl p-8 text-center">
                 <Heart className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
-                <p className="text-muted-foreground text-sm">Wishlist feature coming soon.</p>
-                <Button asChild className="mt-4 bg-accent text-accent-foreground hover:bg-accent/90 rounded-full"><Link to="/products">Browse Products</Link></Button>
+                <p className="text-muted-foreground text-sm">{t("dash.wishlistComingSoon")}</p>
+                <Button asChild className="mt-4 bg-accent text-accent-foreground hover:bg-accent/90 rounded-full"><Link to="/products">{t("dash.browseProducts")}</Link></Button>
               </div>
             )}
 
             {/* ---- EDIT PROFILE ---- */}
             {tab === "profile" && (
               <div className="space-y-6">
-                <h2 className="font-bold text-lg">Edit Profile</h2>
+                <h2 className="font-bold text-lg">{t("dash.editProfile")}</h2>
                 <div className="bg-card border border-border rounded-xl p-6 space-y-4">
                   <div className="flex items-center gap-4 mb-2">
                     <Avatar className="h-16 w-16 border-2 border-accent"><AvatarFallback className="bg-accent text-accent-foreground text-xl font-bold">SH</AvatarFallback></Avatar>
-                    <Button variant="outline" className="rounded-full text-xs">Change Photo</Button>
+                    <Button variant="outline" className="rounded-full text-xs">{t("dash.changePhoto")}</Button>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2"><Label className="text-xs">First Name</Label><Input placeholder="First name" /></div>
-                    <div className="space-y-2"><Label className="text-xs">Last Name</Label><Input placeholder="Last name" /></div>
+                    <div className="space-y-2"><Label className="text-xs">{t("dash.firstName")}</Label><Input placeholder={t("dash.firstName")} /></div>
+                    <div className="space-y-2"><Label className="text-xs">{t("dash.lastName")}</Label><Input placeholder={t("dash.lastName")} /></div>
                   </div>
-                  <div className="space-y-2"><Label className="text-xs">Email Address</Label><Input type="email" placeholder="email@example.com" /></div>
-                  <div className="space-y-2"><Label className="text-xs">Phone Number</Label><Input placeholder="+91 ..." /></div>
-                  <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full gap-1" onClick={() => toast({ title: "Profile updated!" })}><Save className="h-4 w-4" /> Save Changes</Button>
+                  <div className="space-y-2"><Label className="text-xs">{t("dash.emailAddress")}</Label><Input type="email" placeholder="email@example.com" /></div>
+                  <div className="space-y-2"><Label className="text-xs">{t("dash.phoneNumber")}</Label><Input placeholder="+880 ..." /></div>
+                  <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full gap-1" onClick={() => toast({ title: t("dash.profileUpdated") })}><Save className="h-4 w-4" /> {t("dash.saveChanges")}</Button>
                 </div>
               </div>
             )}
@@ -577,13 +580,13 @@ const Dashboard = () => {
             {/* ---- SETTINGS ---- */}
             {tab === "settings" && (
               <div className="space-y-6">
-                <h2 className="font-bold text-lg">Account Settings</h2>
+                <h2 className="font-bold text-lg">{t("dash.accountSettings")}</h2>
                 <div className="bg-card border border-border rounded-xl p-6 space-y-4">
-                  <h3 className="font-semibold text-sm flex items-center gap-2"><Bell className="h-4 w-4 text-accent" /> Notifications</h3>
+                  <h3 className="font-semibold text-sm flex items-center gap-2"><Bell className="h-4 w-4 text-accent" /> {t("dash.notifications")}</h3>
                   {[
-                    { label: "Order status updates", desc: "Get notified when your order ships or is delivered" },
-                    { label: "Promotions & deals", desc: "Receive exclusive offers and discounts" },
-                    { label: "New arrivals", desc: "Be the first to know about new products" },
+                    { label: t("dash.orderStatusUpdates"), desc: t("dash.orderStatusDesc") },
+                    { label: t("dash.promotions"), desc: t("dash.promotionsDesc") },
+                    { label: t("dash.newArrivals"), desc: t("dash.newArrivalsDesc") },
                   ].map(pref => (
                     <div key={pref.label} className="flex items-center justify-between py-1">
                       <div><span className="text-sm">{pref.label}</span><p className="text-[10px] text-muted-foreground">{pref.desc}</p></div>
@@ -592,7 +595,7 @@ const Dashboard = () => {
                   ))}
                 </div>
                 <Separator />
-                <Button variant="destructive" className="rounded-full text-xs gap-1"><LogOut className="h-3.5 w-3.5" /> Delete Account</Button>
+                <Button variant="destructive" className="rounded-full text-xs gap-1"><LogOut className="h-3.5 w-3.5" /> {t("dash.deleteAccount")}</Button>
               </div>
             )}
           </div>
