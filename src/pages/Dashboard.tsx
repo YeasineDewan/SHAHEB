@@ -277,7 +277,7 @@ const Dashboard = () => {
   };
 
   const handleBookAppointment = async () => {
-    if (!apptForm.name || !apptForm.preferred_date || !apptForm.preferred_time) { toast({ title: "Please fill required fields" }); return; }
+    if (!apptForm.name || !apptForm.preferred_date || !apptForm.preferred_time) { toast({ title: t("dash.fillRequired") }); return; }
     setSavingAppt(true);
     const { data: session } = await supabase.auth.getSession();
     const userId = session?.session?.user?.id;
