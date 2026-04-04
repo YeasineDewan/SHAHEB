@@ -20,6 +20,7 @@ import {
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import logoImg from "@/assets/logo.png";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // ---- Session ID for guest users ----
 function getSessionId() {
