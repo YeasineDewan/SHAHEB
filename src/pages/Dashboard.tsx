@@ -285,7 +285,7 @@ const Dashboard = () => {
       ...apptForm, user_id: userId || null, session_id: userId ? null : sessionId,
     } as any);
     if (error) toast({ title: "Error booking appointment", variant: "destructive" });
-    else { toast({ title: "Appointment booked!" }); setApptForm({ name: "", email: "", phone: "", appointment_type: "consultation", preferred_date: "", preferred_time: "", notes: "" }); fetchAppointments(); }
+    else { toast({ title: t("dash.appointmentBooked") }); setApptForm({ name: "", email: "", phone: "", appointment_type: "consultation", preferred_date: "", preferred_time: "", notes: "" }); fetchAppointments(); }
     setSavingAppt(false);
   };
 
