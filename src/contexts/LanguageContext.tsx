@@ -294,7 +294,16 @@ const translations = {
   "dash.newArrivals": { bn: "নতুন পণ্য", en: "New arrivals" },
   "dash.newArrivalsDesc": { bn: "নতুন পণ্য সম্পর্কে প্রথমে জানুন", en: "Be the first to know about new products" },
   "dash.deleteAccount": { bn: "অ্যাকাউন্ট মুছুন", en: "Delete Account" },
-
+  "dash.viewAll": { bn: "সব দেখুন", en: "View All" },
+  "dash.startShopping": { bn: "শপিং শুরু করুন", en: "Start Shopping" },
+  "dash.invoice": { bn: "ইনভয়েস", en: "Invoice" },
+  "dash.track": { bn: "ট্র্যাক", en: "Track" },
+  "dash.browseProducts": { bn: "পণ্য দেখুন", en: "Browse Products" },
+  "dash.describeVision": { bn: "আপনার ভিশন বর্ণনা করুন...", en: "Describe your vision..." },
+  "dash.designSaved": { bn: "ডিজাইন সেভ হয়েছে!", en: "Design saved!" },
+  "dash.designRemoved": { bn: "ডিজাইন মুছে ফেলা হয়েছে", en: "Design removed" },
+  "dash.appointmentBooked": { bn: "অ্যাপয়েন্টমেন্ট বুক হয়েছে!", en: "Appointment booked!" },
+  "dash.fillRequired": { bn: "দয়া করে প্রয়োজনীয় তথ্য পূরণ করুন", en: "Please fill required fields" },
   // AI Style
   "ai.title": { bn: "AI স্টাইল উপদেষ্টা", en: "AI Style Advisor" },
   "ai.desc": { bn: "ব্যক্তিগত কাপড়, রঙ ও স্টাইল সুপারিশ পান", en: "Get personalized fabric, color & style recommendations" },
