@@ -309,11 +309,11 @@ const Dashboard = () => {
         <div className="flex items-center gap-4 mb-8">
           <Avatar className="h-14 w-14 border-2 border-accent"><AvatarFallback className="bg-accent text-accent-foreground text-lg font-bold">SH</AvatarFallback></Avatar>
           <div className="flex-1">
-            <h1 className="text-xl md:text-2xl font-bold">Welcome to SHAHEB</h1>
-            <p className="text-sm text-muted-foreground">Your personal style dashboard</p>
+            <h1 className="text-xl md:text-2xl font-bold">{t("dash.welcome")}</h1>
+            <p className="text-sm text-muted-foreground">{t("dash.subtitle")}</p>
           </div>
           <Button variant="outline" className="rounded-full text-xs hidden md:flex gap-1.5" asChild>
-            <Link to="/track-order"><Truck className="h-3.5 w-3.5" /> Track Order</Link>
+            <Link to="/track-order"><Truck className="h-3.5 w-3.5" /> {t("dash.trackOrder")}</Link>
           </Button>
         </div>
 
