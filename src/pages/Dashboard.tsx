@@ -257,7 +257,7 @@ const Dashboard = () => {
   };
 
   const handleSaveDesign = async () => {
-    if (!designForm.name) { toast({ title: "Please enter a design name" }); return; }
+    if (!designForm.name) { toast({ title: t("dash.designName") }); return; }
     setSavingDesign(true);
     const { data: session } = await supabase.auth.getSession();
     const userId = session?.session?.user?.id;
