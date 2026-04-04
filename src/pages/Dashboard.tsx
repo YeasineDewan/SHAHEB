@@ -292,14 +292,14 @@ const Dashboard = () => {
   const totalSpent = orders.reduce((s, o) => s + o.total, 0);
 
   const sidebarItems = [
-    { id: "overview", icon: User, label: "Overview" },
-    { id: "orders", icon: Package, label: "My Orders" },
-    { id: "designs", icon: PenTool, label: "Saved Designs" },
-    { id: "appointments", icon: CalendarDays, label: "Appointments" },
-    { id: "ai-stylist", icon: Sparkles, label: "AI Stylist" },
-    { id: "wishlist", icon: Heart, label: "Wishlist" },
-    { id: "profile", icon: Edit, label: "Edit Profile" },
-    { id: "settings", icon: Settings, label: "Settings" },
+    { id: "overview", icon: User, label: t("dash.overview") },
+    { id: "orders", icon: Package, label: t("dash.myOrders") },
+    { id: "designs", icon: PenTool, label: t("dash.savedDesigns") },
+    { id: "appointments", icon: CalendarDays, label: t("dash.appointments") },
+    { id: "ai-stylist", icon: Sparkles, label: t("dash.aiStylist") },
+    { id: "wishlist", icon: Heart, label: t("dash.wishlist") },
+    { id: "profile", icon: Edit, label: t("dash.editProfile") },
+    { id: "settings", icon: Settings, label: t("dash.settings") },
   ];
 
   return (
