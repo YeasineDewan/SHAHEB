@@ -76,6 +76,7 @@ function InvoiceModal({ order, onClose }: { order: Order; onClose: () => void })
 
 // ---- AI Style Recommendations Component ----
 function AIStyleRecommendations() {
+  const { t } = useLanguage();
   const [bodyType, setBodyType] = useState("");
   const [preferences, setPreferences] = useState("");
   const [occasion, setOccasion] = useState("");
@@ -85,7 +86,7 @@ function AIStyleRecommendations() {
   const resultRef = useRef<HTMLDivElement>(null);
 
   const getRecommendations = async () => {
-    if (!bodyType) { toast({ title: "Please select your body type" }); return; }
+    if (!bodyType) { toast({ title: t("ai.selectBodyType") }); return; }
     setLoading(true);
     setResult("");
     try {
@@ -127,66 +128,66 @@ function AIStyleRecommendations() {
     <div className="space-y-6">
       <div className="flex items-center gap-3 mb-2">
         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent/20 to-accent/5 flex items-center justify-center"><Sparkles className="h-5 w-5 text-accent" /></div>
-        <div><h2 className="font-bold text-lg">AI Style Advisor</h2><p className="text-xs text-muted-foreground">Get personalized fabric, color & style recommendations</p></div>
+        <div><h2 className="font-bold text-lg">{t("ai.title")}</h2><p className="text-xs text-muted-foreground">{t("ai.desc")}</p></div>
       </div>
 
       <div className="bg-card border border-border rounded-xl p-6 space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label className="text-xs font-medium">Body Type</Label>
+            <Label className="text-xs font-medium">{t("ai.bodyType")}</Label>
             <Select value={bodyType} onValueChange={setBodyType}>
-              <SelectTrigger className="rounded-lg"><SelectValue placeholder="Select body type" /></SelectTrigger>
+              <SelectTrigger className="rounded-lg"><SelectValue placeholder={t("ai.selectBodyType")} /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="slim">Slim / Lean</SelectItem>
-                <SelectItem value="athletic">Athletic / Muscular</SelectItem>
-                <SelectItem value="average">Average / Medium</SelectItem>
-                <SelectItem value="broad">Broad / Stocky</SelectItem>
-                <SelectItem value="tall-slim">Tall & Slim</SelectItem>
-                <SelectItem value="plus">Plus Size</SelectItem>
+                <SelectItem value="slim">{t("ai.slim")}</SelectItem>
+                <SelectItem value="athletic">{t("ai.athletic")}</SelectItem>
+                <SelectItem value="average">{t("ai.average")}</SelectItem>
+                <SelectItem value="broad">{t("ai.broad")}</SelectItem>
+                <SelectItem value="tall-slim">{t("ai.tallSlim")}</SelectItem>
+                <SelectItem value="plus">{t("ai.plus")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div className="space-y-2">
-            <Label className="text-xs font-medium">Occasion</Label>
+            <Label className="text-xs font-medium">{t("ai.occasion")}</Label>
             <Select value={occasion} onValueChange={setOccasion}>
-              <SelectTrigger className="rounded-lg"><SelectValue placeholder="What's the occasion?" /></SelectTrigger>
+              <SelectTrigger className="rounded-lg"><SelectValue placeholder={t("ai.occasionPlaceholder")} /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="casual">Casual / Everyday</SelectItem>
-                <SelectItem value="formal">Formal / Business</SelectItem>
-                <SelectItem value="wedding">Wedding / Festive</SelectItem>
-                <SelectItem value="party">Party / Night Out</SelectItem>
-                <SelectItem value="date">Date Night</SelectItem>
-                <SelectItem value="interview">Job Interview</SelectItem>
+                <SelectItem value="casual">{t("ai.casual")}</SelectItem>
+                <SelectItem value="formal">{t("ai.formal")}</SelectItem>
+                <SelectItem value="wedding">{t("ai.wedding")}</SelectItem>
+                <SelectItem value="party">{t("ai.party")}</SelectItem>
+                <SelectItem value="date">{t("ai.dateNight")}</SelectItem>
+                <SelectItem value="interview">{t("ai.interview")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div className="space-y-2">
-            <Label className="text-xs font-medium">Budget Range</Label>
+            <Label className="text-xs font-medium">{t("ai.budget")}</Label>
             <Select value={budget} onValueChange={setBudget}>
-              <SelectTrigger className="rounded-lg"><SelectValue placeholder="Select budget" /></SelectTrigger>
+              <SelectTrigger className="rounded-lg"><SelectValue placeholder={t("ai.selectBudget")} /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="under-2000">Under ₹2,000</SelectItem>
-                <SelectItem value="2000-5000">₹2,000 – ₹5,000</SelectItem>
-                <SelectItem value="5000-10000">₹5,000 – ₹10,000</SelectItem>
-                <SelectItem value="10000-plus">₹10,000+</SelectItem>
-                <SelectItem value="flexible">Flexible</SelectItem>
+                <SelectItem value="under-2000">৳২,০০০ এর নিচে</SelectItem>
+                <SelectItem value="2000-5000">৳২,০০০ – ৳৫,০০০</SelectItem>
+                <SelectItem value="5000-10000">৳৫,০০০ – ৳১০,০০০</SelectItem>
+                <SelectItem value="10000-plus">৳১০,০০০+</SelectItem>
+                <SelectItem value="flexible">{t("ai.flexible")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div className="space-y-2">
-            <Label className="text-xs font-medium">Style Preferences</Label>
-            <Input placeholder="e.g. minimalist, bold colors, classic..." value={preferences} onChange={e => setPreferences(e.target.value)} className="rounded-lg" />
+            <Label className="text-xs font-medium">{t("ai.preferences")}</Label>
+            <Input placeholder={t("ai.prefPlaceholder")} value={preferences} onChange={e => setPreferences(e.target.value)} className="rounded-lg" />
           </div>
         </div>
         <Button onClick={getRecommendations} disabled={loading} className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full gap-2">
           {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
-          {loading ? "Generating..." : "Get AI Recommendations"}
+          {loading ? t("ai.generating") : t("ai.getRecommendations")}
         </Button>
       </div>
 
       {result && (
         <div ref={resultRef} className="bg-card border border-border rounded-xl p-6 prose prose-sm dark:prose-invert max-w-none">
-          <div className="flex items-center gap-2 mb-4"><Sparkles className="h-4 w-4 text-accent" /><span className="font-semibold text-sm text-accent">AI Recommendations</span></div>
+          <div className="flex items-center gap-2 mb-4"><Sparkles className="h-4 w-4 text-accent" /><span className="font-semibold text-sm text-accent">{t("ai.recommendations")}</span></div>
           <div className="whitespace-pre-wrap text-sm leading-relaxed">{result}</div>
         </div>
       )}
