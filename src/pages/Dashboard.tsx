@@ -273,7 +273,7 @@ const Dashboard = () => {
   const handleDeleteDesign = async (id: string) => {
     await supabase.from("saved_designs" as any).delete().eq("id", id);
     fetchSavedDesigns();
-    toast({ title: "Design removed" });
+    toast({ title: t("dash.designRemoved") });
   };
 
   const handleBookAppointment = async () => {
