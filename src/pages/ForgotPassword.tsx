@@ -34,7 +34,7 @@ const ForgotPassword = () => {
       <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md text-center">
           <div className="w-16 h-16 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-6">
-            {sent ? <CheckCircle className="h-7 w-7 text-green-500" /> : <Mail className="h-7 w-7 text-accent" />}
+            {sent ? <CheckCircle className="h-7 w-7 text-accent" /> : <Mail className="h-7 w-7 text-accent" />}
           </div>
           <h1 className="font-display text-3xl font-bold mb-2">{t("auth.resetPassword")}</h1>
           <p className="text-muted-foreground text-sm mb-8">{sent ? t("auth.resetSent") : t("auth.resetDesc")}</p>
