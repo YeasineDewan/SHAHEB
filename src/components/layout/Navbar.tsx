@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, ShoppingBag, User, Search, Heart } from "lucide-react";
+import { Menu, X, ShoppingBag, User, Search, Heart, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import logoImg from "@/assets/logo.png";
@@ -17,6 +18,7 @@ export function Navbar() {
   const location = useLocation();
   const { itemCount } = useCart();
   const { t } = useLanguage();
+  const { user, signOut } = useAuth();
 
   const announcements = [
     t("announce.free_shipping"),
@@ -113,12 +115,25 @@ export function Navbar() {
               <div className="flex items-center gap-3 pt-4 border-t border-primary-foreground/10">
                 <ThemeToggle />
                 <LanguageToggle />
-                <Button variant="outline" size="sm" className="border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10 rounded-full text-xs" asChild>
-                  <Link to="/login" onClick={() => setMobileMenuOpen(false)}>{t("nav.login")}</Link>
-                </Button>
-                <Button variant="outline" size="sm" className="border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10 rounded-full text-xs" asChild>
-                  <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)}>{t("nav.dashboard")}</Link>
-                </Button>
+                {user ? (
+                  <>
+                    <Button variant="outline" size="sm" className="border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10 rounded-full text-xs" asChild>
+                      <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)}>{t("nav.dashboard")}</Link>
+                    </Button>
+                    <Button variant="outline" size="sm" className="border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10 rounded-full text-xs" onClick={() => { signOut(); setMobileMenuOpen(false); }}>
+                      <LogOut className="h-3 w-3 mr-1" /> {t("auth.logout")}
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button variant="outline" size="sm" className="border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10 rounded-full text-xs" asChild>
+                      <Link to="/login" onClick={() => setMobileMenuOpen(false)}>{t("nav.login")}</Link>
+                    </Button>
+                    <Button variant="outline" size="sm" className="border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10 rounded-full text-xs" asChild>
+                      <Link to="/signup" onClick={() => setMobileMenuOpen(false)}>{t("auth.signup")}</Link>
+                    </Button>
+                  </>
+                )}
               </div>
             </nav>
           </div>
@@ -157,9 +172,20 @@ export function Navbar() {
                 {itemCount > 0 && <span className="absolute top-1 right-1 w-4 h-4 bg-accent text-accent-foreground text-[9px] font-bold rounded-full flex items-center justify-center">{itemCount}</span>}
               </Link>
             </Button>
-            <Button variant="ghost" size="sm" className="text-primary-foreground hover:bg-primary-foreground/10 text-xs tracking-wider uppercase ml-1" asChild>
-              <Link to="/login"><User className="h-4 w-4 mr-1.5" /> {t("nav.login")}</Link>
-            </Button>
+            {user ? (
+              <div className="flex items-center gap-1 ml-1">
+                <Button variant="ghost" size="sm" className="text-primary-foreground hover:bg-primary-foreground/10 text-xs tracking-wider uppercase" asChild>
+                  <Link to="/dashboard"><User className="h-4 w-4 mr-1.5" /> {t("nav.dashboard")}</Link>
+                </Button>
+                <Button variant="ghost" size="icon" className="text-primary-foreground hover:bg-primary-foreground/10" onClick={signOut} title={t("auth.logout")}>
+                  <LogOut className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              <Button variant="ghost" size="sm" className="text-primary-foreground hover:bg-primary-foreground/10 text-xs tracking-wider uppercase ml-1" asChild>
+                <Link to="/login"><User className="h-4 w-4 mr-1.5" /> {t("nav.login")}</Link>
+              </Button>
+            )}
           </div>
         </div>
       </div>
