@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { CartProvider } from "./contexts/CartContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
+import { AuthProvider } from "./contexts/AuthContext";
 import { AIChatWidget } from "./components/AIChatWidget";
 import Index from "./pages/Index";
 import Products from "./pages/Products";
