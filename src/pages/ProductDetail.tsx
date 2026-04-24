@@ -152,7 +152,7 @@ const ProductDetail = () => {
               <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
                 <Button size="icon" variant="secondary" className="rounded-full h-9 w-9 shadow-lg"><ZoomIn className="h-4 w-4" /></Button>
               </div>
-              {discount > 0 && <Badge variant="destructive" className="absolute top-3 left-3">-{discount}% OFF</Badge>}
+              {discount > 0 && <Badge variant="destructive" className="absolute top-3 left-3">-{discount}%</Badge>}
             </div>
             {images.length > 1 && (
               <div className="flex gap-2 overflow-x-auto scrollbar-hide">
@@ -234,7 +234,7 @@ const ProductDetail = () => {
                 <ShoppingBag className="mr-2 h-5 w-5" /> {t("product.addToCart")} — ৳{(product.price * quantity).toLocaleString()}
               </Button>
               <Button variant="outline" size="icon" className={`h-12 w-12 rounded-full ${isWishlisted ? "text-red-500 border-red-200" : ""}`}
-                onClick={() => { setIsWishlisted(!isWishlisted); toast({ title: isWishlisted ? "Removed from wishlist" : t("products.addedToWishlist") }); }}>
+                onClick={() => { setIsWishlisted(!isWishlisted); toast({ title: isWishlisted ? t("general.removedFromWishlist") : t("products.addedToWishlist") }); }}>
                 <Heart className={`h-5 w-5 ${isWishlisted ? "fill-red-500" : ""}`} />
               </Button>
               <Button variant="outline" size="icon" className="h-12 w-12 rounded-full" onClick={handleShare}>
@@ -297,7 +297,7 @@ const ProductDetail = () => {
 
       <Dialog open={showZoom} onOpenChange={setShowZoom}>
         <DialogContent className="max-w-4xl p-1">
-          <DialogTitle className="sr-only">Image Zoom</DialogTitle>
+          <DialogTitle className="sr-only">{product.name}</DialogTitle>
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="icon" className="shrink-0" onClick={() => setSelectedImage(Math.max(0, selectedImage - 1))}><ChevronLeft className="h-5 w-5" /></Button>
             <img src={images[selectedImage]} alt={product.name} className="w-full rounded-lg" />
