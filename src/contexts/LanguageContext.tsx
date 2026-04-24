@@ -520,7 +520,9 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }, [language]);
 
   const t = (key: TranslationKey): string => {
-    return translations[key]?.[language] || key;
+    const entry = translations[key];
+    if (!entry) return String(key);
+    return entry[language] ?? entry.en ?? entry.bn ?? String(key);
   };
 
   return (
