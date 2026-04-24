@@ -584,7 +584,7 @@ const Dashboard = () => {
                     <div className="space-y-2"><Label className="text-xs">{t("dash.firstName")}</Label><Input placeholder={t("dash.firstName")} /></div>
                     <div className="space-y-2"><Label className="text-xs">{t("dash.lastName")}</Label><Input placeholder={t("dash.lastName")} /></div>
                   </div>
-                  <div className="space-y-2"><Label className="text-xs">{t("dash.emailAddress")}</Label><Input type="email" placeholder="email@example.com" /></div>
+                  <div className="space-y-2"><Label className="text-xs">{t("dash.emailAddress")}</Label><Input type="email" placeholder={t("dash.emailPlaceholder")} /></div>
                   <div className="space-y-2"><Label className="text-xs">{t("dash.phoneNumber")}</Label><Input placeholder="+880 ..." /></div>
                   <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full gap-1" onClick={() => toast({ title: t("dash.profileUpdated") })}><Save className="h-4 w-4" /> {t("dash.saveChanges")}</Button>
                 </div>
