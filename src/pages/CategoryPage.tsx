@@ -16,12 +16,12 @@ const CategoryPage = () => {
   const { t } = useLanguage();
 
   const categoryInfo: Record<string, { title: string; description: string; banner: string }> = {
-    shirts: { title: t("cat.shirts"), description: "Premium cotton & linen shirts for every occasion", banner: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=1200&h=400&fit=crop" },
-    trousers: { title: t("cat.trousers"), description: "Tailored fits from chinos to joggers", banner: "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=1200&h=400&fit=crop" },
-    jackets: { title: t("cat.jackets"), description: "Statement outerwear for the modern man", banner: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=1200&h=400&fit=crop" },
-    ethnic: { title: t("cat.ethnic"), description: "Authentic kurtas and traditional sets", banner: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=1200&h=400&fit=crop" },
-    accessories: { title: t("cat.accessories"), description: "Complete your look with premium accessories", banner: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=1200&h=400&fit=crop" },
-    digital: { title: t("cat.digital"), description: "Style guides, eBooks & exclusive content", banner: "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=1200&h=400&fit=crop" },
+    shirts: { title: t("cat.shirts"), description: t("cat.shirtsDesc"), banner: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=1200&h=400&fit=crop" },
+    trousers: { title: t("cat.trousers"), description: t("cat.trousersDesc"), banner: "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=1200&h=400&fit=crop" },
+    jackets: { title: t("cat.jackets"), description: t("cat.jacketsDesc"), banner: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=1200&h=400&fit=crop" },
+    ethnic: { title: t("cat.ethnic"), description: t("cat.ethnicDesc"), banner: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=1200&h=400&fit=crop" },
+    accessories: { title: t("cat.accessories"), description: t("cat.accessoriesDesc"), banner: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=1200&h=400&fit=crop" },
+    digital: { title: t("cat.digital"), description: t("cat.digitalDesc"), banner: "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=1200&h=400&fit=crop" },
   };
 
   const info = categoryInfo[slug || ""] || { title: slug || "Category", description: "", banner: "" };
