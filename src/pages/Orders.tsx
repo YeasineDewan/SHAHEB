@@ -28,8 +28,15 @@ const Orders = () => {
   const navigate = useNavigate();
 
   const getStatusLabel = (status: string) => {
-    const key = `orders.status.${status}` as const;
-    return t(key);
+    const statusMap = {
+      pending: t("orders.status.pending"),
+      processing: t("orders.status.processing"),
+      shipped: t("orders.status.shipped"),
+      delivered: t("orders.status.delivered"),
+      cancelled: t("orders.status.cancelled"),
+    };
+
+    return statusMap[status as keyof typeof statusMap] || status;
   };
 
   useEffect(() => {
