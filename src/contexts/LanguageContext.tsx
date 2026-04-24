@@ -334,6 +334,13 @@ const translations = {
   "dash.designRemoved": { bn: "ডিজাইন মুছে ফেলা হয়েছে", en: "Design removed" },
   "dash.appointmentBooked": { bn: "অ্যাপয়েন্টমেন্ট বুক হয়েছে!", en: "Appointment booked!" },
   "dash.fillRequired": { bn: "দয়া করে প্রয়োজনীয় তথ্য পূরণ করুন", en: "Please fill required fields" },
+
+  // Admin access
+  "admin.loadingTitle": { bn: "অ্যাডমিন অ্যাক্সেস যাচাই হচ্ছে", en: "Checking admin access" },
+  "admin.loadingDesc": { bn: "অনুগ্রহ করে অপেক্ষা করুন, আপনার অনুমতি যাচাই করা হচ্ছে।", en: "Please wait while we verify your permissions." },
+  "admin.accessDeniedTitle": { bn: "অ্যাক্সেস সীমাবদ্ধ", en: "Access restricted" },
+  "admin.accessDeniedDesc": { bn: "এই ড্যাশবোর্ড শুধুমাত্র admin role থাকা ইউজারদের জন্য।", en: "This dashboard is only available to users with the admin role." },
+  "admin.backToDashboard": { bn: "ব্যবহারকারী ড্যাশবোর্ডে ফিরে যান", en: "Back to dashboard" },
   // AI Style
   "ai.title": { bn: "AI স্টাইল উপদেষ্টা", en: "AI Style Advisor" },
   "ai.desc": { bn: "ব্যক্তিগত কাপড়, রঙ ও স্টাইল সুপারিশ পান", en: "Get personalized fabric, color & style recommendations" },
