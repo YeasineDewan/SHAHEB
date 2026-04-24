@@ -27,6 +27,18 @@ const Orders = () => {
   const [user, setUser] = useState<any>(null);
   const navigate = useNavigate();
 
+  const getStatusLabel = (status: string) => {
+    const statusMap = {
+      pending: t("orders.status.pending"),
+      processing: t("orders.status.processing"),
+      shipped: t("orders.status.shipped"),
+      delivered: t("orders.status.delivered"),
+      cancelled: t("orders.status.cancelled"),
+    };
+
+    return statusMap[status as keyof typeof statusMap] || status;
+  };
+
   useEffect(() => {
     const init = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -86,11 +98,11 @@ const Orders = () => {
                     </div>
                     <div className="hidden sm:block">
                       <p className="text-xs text-muted-foreground">{t("general.date")}</p>
-                      <p className="text-sm">{new Date(order.created_at).toLocaleDateString("bn-BD", { year: "numeric", month: "short", day: "numeric" })}</p>
+                      <p className="text-sm">{new Date(order.created_at).toLocaleDateString("en-IN", { year: "numeric", month: "short", day: "numeric" })}</p>
                     </div>
                   </div>
                   <Badge className={statusColor[order.status] || statusColor.pending}>
-                    {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                    {getStatusLabel(order.status)}
                   </Badge>
                 </div>
 

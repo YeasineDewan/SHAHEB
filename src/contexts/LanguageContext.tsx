@@ -256,12 +256,28 @@ const translations = {
   "general.invoice": { bn: "ইনভয়েস", en: "Invoice" },
   "general.items": { bn: "আইটেমসমূহ", en: "items" },
   "general.noResults": { bn: "কোনো ফলাফল পাওয়া যায়নি", en: "No results found" },
+  "general.orderLower": { bn: "অর্ডার", en: "Order" },
+  "general.dateLower": { bn: "তারিখ", en: "Date" },
+  "general.removedFromWishlist": { bn: "উইশলিস্ট থেকে সরানো হয়েছে", en: "Removed from wishlist" },
+
+  // Categories
+  "cat.shirtsDesc": { bn: "প্রতিটি উপলক্ষের জন্য প্রিমিয়াম কটন ও লিনেন শার্ট", en: "Premium cotton and linen shirts for every occasion" },
+  "cat.trousersDesc": { bn: "চিনো থেকে জগারস পর্যন্ত নিখুঁত ফিট", en: "Tailored fits from chinos to joggers" },
+  "cat.jacketsDesc": { bn: "আধুনিক পুরুষের জন্য স্টেটমেন্ট আউটারওয়্যার", en: "Statement outerwear for the modern man" },
+  "cat.ethnicDesc": { bn: "অথেনটিক পাঞ্জাবি ও ট্র্যাডিশনাল সেট", en: "Authentic kurtas and traditional sets" },
+  "cat.accessoriesDesc": { bn: "প্রিমিয়াম এক্সেসরিজ দিয়ে আপনার লুক সম্পূর্ণ করুন", en: "Complete your look with premium accessories" },
+  "cat.digitalDesc": { bn: "স্টাইল গাইড, ইবুক ও এক্সক্লুসিভ কনটেন্ট", en: "Style guides, eBooks and exclusive content" },
 
   // Orders page
   "orders.title": { bn: "আমার অর্ডার", en: "My Orders" },
   "orders.empty": { bn: "এখনো কোনো অর্ডার নেই", en: "No orders yet" },
   "orders.emptyDesc": { bn: "কেনাকাটা শুরু করুন এবং এখানে আপনার অর্ডার দেখুন।", en: "Start shopping to see your orders here." },
   "orders.startShopping": { bn: "কেনাকাটা শুরু করুন", en: "Start Shopping" },
+  "orders.status.pending": { bn: "পেন্ডিং", en: "Pending" },
+  "orders.status.processing": { bn: "প্রসেসিং", en: "Processing" },
+  "orders.status.shipped": { bn: "শিপড", en: "Shipped" },
+  "orders.status.delivered": { bn: "ডেলিভার্ড", en: "Delivered" },
+  "orders.status.cancelled": { bn: "বাতিল", en: "Cancelled" },
 
   // Dashboard
   "dash.welcome": { bn: "SHAHEB এ স্বাগতম", en: "Welcome to SHAHEB" },
@@ -334,6 +350,37 @@ const translations = {
   "dash.designRemoved": { bn: "ডিজাইন মুছে ফেলা হয়েছে", en: "Design removed" },
   "dash.appointmentBooked": { bn: "অ্যাপয়েন্টমেন্ট বুক হয়েছে!", en: "Appointment booked!" },
   "dash.fillRequired": { bn: "দয়া করে প্রয়োজনীয় তথ্য পূরণ করুন", en: "Please fill required fields" },
+  "dash.errorSavingDesign": { bn: "ডিজাইন সংরক্ষণ করা যায়নি", en: "Couldn't save design" },
+  "dash.errorBookingAppointment": { bn: "অ্যাপয়েন্টমেন্ট বুক করা যায়নি", en: "Couldn't book appointment" },
+  "dash.orderItemSummary": { bn: "{count}টি আইটেম", en: "{count} items" },
+  "dash.quantityPrice": { bn: "পরিমাণ: {qty} · ৳{price}", en: "Qty: {qty} · ৳{price}" },
+  "dash.orderTotal": { bn: "মোট: ৳{total}", en: "Total: ৳{total}" },
+  "dash.designPlaceholder": { bn: "যেমন: ওয়েডিং শেরওয়ানি", en: "e.g. Wedding Sherwani" },
+  "dash.fabricPlaceholder": { bn: "যেমন: সিল্ক, লিনেন, কটন", en: "e.g. Silk, Linen, Cotton" },
+  "dash.colorPlaceholder": { bn: "যেমন: নেভি ও গোল্ড", en: "e.g. Navy and Gold" },
+  "dash.stylePlaceholder": { bn: "যেমন: মডার্ন এথনিক", en: "e.g. Modern Ethnic" },
+  "dash.fullNamePlaceholder": { bn: "পুরো নাম", en: "Full name" },
+  "dash.emailPlaceholder": { bn: "email@example.com", en: "email@example.com" },
+  "dash.phonePlaceholder": { bn: "+880 ...", en: "+880 ..." },
+  "dash.appointmentDateTime": { bn: "{date} সময় {time}", en: "{date} at {time}" },
+  "dash.status.pending": { bn: "পেন্ডিং", en: "Pending" },
+  "dash.status.processing": { bn: "প্রসেসিং", en: "Processing" },
+  "dash.status.shipped": { bn: "শিপড", en: "Shipped" },
+  "dash.status.delivered": { bn: "ডেলিভার্ড", en: "Delivered" },
+  "dash.status.cancelled": { bn: "বাতিল", en: "Cancelled" },
+  "dash.status.confirmed": { bn: "নিশ্চিত", en: "Confirmed" },
+  "dash.status.active": { bn: "সক্রিয়", en: "Active" },
+  "dash.budget.under2000": { bn: "৳২,০০০ এর নিচে", en: "Under ৳2,000" },
+  "dash.budget.2000to5000": { bn: "৳২,০০০ – ৳৫,০০০", en: "৳2,000 – ৳5,000" },
+  "dash.budget.5000to10000": { bn: "৳৫,০০০ – ৳১০,০০০", en: "৳5,000 – ৳10,000" },
+  "dash.budget.10000plus": { bn: "৳১০,০০০+", en: "৳10,000+" },
+
+  // Admin access
+  "admin.loadingTitle": { bn: "অ্যাডমিন অ্যাক্সেস যাচাই হচ্ছে", en: "Checking admin access" },
+  "admin.loadingDesc": { bn: "অনুগ্রহ করে অপেক্ষা করুন, আপনার অনুমতি যাচাই করা হচ্ছে।", en: "Please wait while we verify your permissions." },
+  "admin.accessDeniedTitle": { bn: "অ্যাক্সেস সীমাবদ্ধ", en: "Access restricted" },
+  "admin.accessDeniedDesc": { bn: "এই ড্যাশবোর্ড শুধুমাত্র admin role থাকা ইউজারদের জন্য।", en: "This dashboard is only available to users with the admin role." },
+  "admin.backToDashboard": { bn: "ব্যবহারকারী ড্যাশবোর্ডে ফিরে যান", en: "Back to dashboard" },
   // AI Style
   "ai.title": { bn: "AI স্টাইল উপদেষ্টা", en: "AI Style Advisor" },
   "ai.desc": { bn: "ব্যক্তিগত কাপড়, রঙ ও স্টাইল সুপারিশ পান", en: "Get personalized fabric, color & style recommendations" },
@@ -513,7 +560,9 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }, [language]);
 
   const t = (key: TranslationKey): string => {
-    return translations[key]?.[language] || key;
+    const entry = translations[key];
+    if (!entry) return String(key);
+    return entry[language] ?? entry.en ?? entry.bn ?? String(key);
   };
 
   return (

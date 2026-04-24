@@ -203,7 +203,6 @@ const AdminDashboard = () => {
   const [orders, setOrders] = useState<OrderWithItems[]>([]);
   const [coupons, setCoupons] = useState<Tables<"coupons">[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
 
   // Product form
   const [showProductForm, setShowProductForm] = useState(false);
@@ -218,14 +217,6 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     const init = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-
-      if (user) {
-        const { data: roleData } = await supabase.rpc("has_role", { _user_id: user.id, _role: "admin" });
-        if (roleData) setIsAdmin(true);
-      }
-
-      // Fetch data (products are public, orders/coupons need admin)
       const [prodRes, ordRes, coupRes] = await Promise.all([
         supabase.from("products").select("*").order("created_at", { ascending: false }),
         supabase.from("orders").select("*, order_items(*)").order("created_at", { ascending: false }),

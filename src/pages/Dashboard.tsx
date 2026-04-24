@@ -291,6 +291,20 @@ const Dashboard = () => {
 
   const totalSpent = orders.reduce((s, o) => s + o.total, 0);
 
+  const getDashStatusLabel = (status: string) => {
+    const statusMap = {
+      pending: t("dash.status.pending"),
+      processing: t("dash.status.processing"),
+      shipped: t("dash.status.shipped"),
+      delivered: t("dash.status.delivered"),
+      cancelled: t("dash.status.cancelled"),
+      confirmed: t("dash.status.confirmed"),
+      active: t("dash.status.active"),
+    };
+
+    return statusMap[status as keyof typeof statusMap] || status;
+  };
+
   const sidebarItems = [
     { id: "overview", icon: User, label: t("dash.overview") },
     { id: "orders", icon: Package, label: t("dash.myOrders") },
@@ -364,9 +378,9 @@ const Dashboard = () => {
                     <div className="divide-y divide-border">
                       {orders.slice(0, 3).map(order => (
                         <div key={order.id} className="flex items-center justify-between px-5 py-3">
-                          <div><p className="text-sm font-medium">{order.order_number}</p><p className="text-xs text-muted-foreground">{order.date} · {order.items.length} items</p></div>
+                          <div><p className="text-sm font-medium">{order.order_number}</p><p className="text-xs text-muted-foreground">{order.date} · {t("dash.orderItemSummary").replace("{count}", String(order.items.length))}</p></div>
                           <div className="flex items-center gap-2">
-                            <Badge className={statusColor[order.status] || "bg-secondary"} variant="outline">{order.status}</Badge>
+                            <Badge className={statusColor[order.status] || "bg-secondary"} variant="outline">{getDashStatusLabel(order.status)}</Badge>
                             <span className="text-sm font-bold">৳{order.total.toLocaleString()}</span>
                           </div>
                         </div>
@@ -412,10 +426,10 @@ const Dashboard = () => {
                   <div key={order.id} className="bg-card border border-border rounded-xl overflow-hidden">
                     <div className="flex items-center justify-between px-5 py-3 bg-secondary/50 border-b border-border">
                       <div className="flex items-center gap-4">
-                        <div><p className="text-xs text-muted-foreground">Order</p><p className="text-sm font-semibold">{order.order_number}</p></div>
-                        <div className="hidden sm:block"><p className="text-xs text-muted-foreground">Date</p><p className="text-sm">{order.date}</p></div>
+                        <div><p className="text-xs text-muted-foreground">{t("general.orderLower")}</p><p className="text-sm font-semibold">{order.order_number}</p></div>
+                        <div className="hidden sm:block"><p className="text-xs text-muted-foreground">{t("general.dateLower")}</p><p className="text-sm">{order.date}</p></div>
                       </div>
-                      <Badge className={statusColor[order.status] || "bg-secondary"} variant="outline">{order.status}</Badge>
+                      <Badge className={statusColor[order.status] || "bg-secondary"} variant="outline">{getDashStatusLabel(order.status)}</Badge>
                     </div>
                     <div className="p-5 space-y-3">
                       {order.items.map((item, i) => (
@@ -425,13 +439,13 @@ const Dashboard = () => {
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium line-clamp-1">{item.name}</p>
-                            <p className="text-xs text-muted-foreground">Qty: {item.qty} · ৳{item.price.toLocaleString()}</p>
+                            <p className="text-xs text-muted-foreground">{t("dash.quantityPrice").replace("{qty}", String(item.qty)).replace("{price}", item.price.toLocaleString())}</p>
                           </div>
                         </div>
                       ))}
                     </div>
                     <div className="flex items-center justify-between px-5 py-3 border-t border-border">
-                      <p className="text-sm font-bold">Total: <span className="text-accent">৳{order.total.toLocaleString()}</span></p>
+                      <p className="text-sm font-bold">{t("dash.orderTotal").replace("{total}", order.total.toLocaleString()).split("৳" + order.total.toLocaleString())[0]}<span className="text-accent">৳{order.total.toLocaleString()}</span></p>
                       <div className="flex gap-2">
                         <Button size="sm" variant="ghost" className="text-xs gap-1" onClick={() => setInvoiceOrder(order)}><Receipt className="h-3 w-3" /> {t("dash.invoice")}</Button>
                         <Button size="sm" variant="ghost" className="text-xs gap-1" asChild><Link to={`/track-order?id=${order.order_number}`}><Truck className="h-3 w-3" /> {t("dash.track")}</Link></Button>
@@ -449,10 +463,10 @@ const Dashboard = () => {
                 <div className="bg-card border border-border rounded-xl p-6 space-y-4">
                   <h3 className="font-semibold text-sm flex items-center gap-2"><PenTool className="h-4 w-4 text-accent" /> {t("dash.saveNewDesign")}</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2"><Label className="text-xs">{t("dash.designName")}</Label><Input placeholder="e.g. Wedding Sherwani" value={designForm.name} onChange={e => setDesignForm(f => ({ ...f, name: e.target.value }))} /></div>
-                    <div className="space-y-2"><Label className="text-xs">{t("dash.fabric")}</Label><Input placeholder="e.g. Silk, Linen, Cotton" value={designForm.fabric} onChange={e => setDesignForm(f => ({ ...f, fabric: e.target.value }))} /></div>
-                    <div className="space-y-2"><Label className="text-xs">{t("dash.colorPalette")}</Label><Input placeholder="e.g. Navy & Gold" value={designForm.color} onChange={e => setDesignForm(f => ({ ...f, color: e.target.value }))} /></div>
-                    <div className="space-y-2"><Label className="text-xs">{t("dash.style")}</Label><Input placeholder="e.g. Modern Ethnic" value={designForm.style} onChange={e => setDesignForm(f => ({ ...f, style: e.target.value }))} /></div>
+                    <div className="space-y-2"><Label className="text-xs">{t("dash.designName")}</Label><Input placeholder={t("dash.designPlaceholder")} value={designForm.name} onChange={e => setDesignForm(f => ({ ...f, name: e.target.value }))} /></div>
+                    <div className="space-y-2"><Label className="text-xs">{t("dash.fabric")}</Label><Input placeholder={t("dash.fabricPlaceholder")} value={designForm.fabric} onChange={e => setDesignForm(f => ({ ...f, fabric: e.target.value }))} /></div>
+                    <div className="space-y-2"><Label className="text-xs">{t("dash.colorPalette")}</Label><Input placeholder={t("dash.colorPlaceholder")} value={designForm.color} onChange={e => setDesignForm(f => ({ ...f, color: e.target.value }))} /></div>
+                    <div className="space-y-2"><Label className="text-xs">{t("dash.style")}</Label><Input placeholder={t("dash.stylePlaceholder")} value={designForm.style} onChange={e => setDesignForm(f => ({ ...f, style: e.target.value }))} /></div>
                   </div>
                   <div className="space-y-2"><Label className="text-xs">{t("dash.notes")}</Label><Textarea placeholder={t("dash.describeVision")} value={designForm.notes} onChange={e => setDesignForm(f => ({ ...f, notes: e.target.value }))} rows={2} /></div>
                   <Button onClick={handleSaveDesign} disabled={savingDesign} className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full gap-2">
@@ -474,9 +488,9 @@ const Dashboard = () => {
                           <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" onClick={() => handleDeleteDesign(d.id)}><X className="h-3.5 w-3.5" /></Button>
                         </div>
                         <div className="flex flex-wrap gap-2 mt-2">
-                          {d.fabric && <Badge variant="outline" className="text-[10px]">🧵 {d.fabric}</Badge>}
-                          {d.color && <Badge variant="outline" className="text-[10px]">🎨 {d.color}</Badge>}
-                          {d.style && <Badge variant="outline" className="text-[10px]">✨ {d.style}</Badge>}
+                           {d.fabric && <Badge variant="outline" className="text-[10px]">{d.fabric}</Badge>}
+                           {d.color && <Badge variant="outline" className="text-[10px]">{d.color}</Badge>}
+                           {d.style && <Badge variant="outline" className="text-[10px]">{d.style}</Badge>}
                         </div>
                         {d.notes && <p className="text-xs text-muted-foreground mt-2 line-clamp-2">{d.notes}</p>}
                         <p className="text-[10px] text-muted-foreground mt-3">{new Date(d.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</p>
@@ -494,9 +508,9 @@ const Dashboard = () => {
                 <div className="bg-card border border-border rounded-xl p-6 space-y-4">
                   <h3 className="font-semibold text-sm flex items-center gap-2"><CalendarDays className="h-4 w-4 text-accent" /> {t("dash.bookConsultation")}</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2"><Label className="text-xs">{t("dash.yourName")}</Label><Input placeholder="Full name" value={apptForm.name} onChange={e => setApptForm(f => ({ ...f, name: e.target.value }))} /></div>
-                    <div className="space-y-2"><Label className="text-xs">{t("dash.email")}</Label><Input type="email" placeholder="email@example.com" value={apptForm.email} onChange={e => setApptForm(f => ({ ...f, email: e.target.value }))} /></div>
-                    <div className="space-y-2"><Label className="text-xs">{t("dash.phone")}</Label><Input placeholder="+880 ..." value={apptForm.phone} onChange={e => setApptForm(f => ({ ...f, phone: e.target.value }))} /></div>
+                    <div className="space-y-2"><Label className="text-xs">{t("dash.yourName")}</Label><Input placeholder={t("dash.fullNamePlaceholder")} value={apptForm.name} onChange={e => setApptForm(f => ({ ...f, name: e.target.value }))} /></div>
+                    <div className="space-y-2"><Label className="text-xs">{t("dash.email")}</Label><Input type="email" placeholder={t("dash.emailPlaceholder")} value={apptForm.email} onChange={e => setApptForm(f => ({ ...f, email: e.target.value }))} /></div>
+                    <div className="space-y-2"><Label className="text-xs">{t("dash.phone")}</Label><Input placeholder={t("dash.phonePlaceholder")} value={apptForm.phone} onChange={e => setApptForm(f => ({ ...f, phone: e.target.value }))} /></div>
                     <div className="space-y-2">
                       <Label className="text-xs">{t("dash.type")}</Label>
                       <Select value={apptForm.appointment_type} onValueChange={v => setApptForm(f => ({ ...f, appointment_type: v }))}>
@@ -534,10 +548,10 @@ const Dashboard = () => {
                           <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center"><Clock className="h-5 w-5 text-accent" /></div>
                           <div>
                             <p className="font-medium text-sm capitalize">{a.appointment_type.replace("-", " ")}</p>
-                            <p className="text-xs text-muted-foreground">{new Date(a.preferred_date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })} at {a.preferred_time}</p>
+                            <p className="text-xs text-muted-foreground">{t("dash.appointmentDateTime").replace("{date}", new Date(a.preferred_date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })).replace("{time}", a.preferred_time)}</p>
                           </div>
                         </div>
-                        <Badge className={a.status === "confirmed" ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : a.status === "cancelled" ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"} variant="outline">{a.status}</Badge>
+                        <Badge className={a.status === "confirmed" ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : a.status === "cancelled" ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"} variant="outline">{getDashStatusLabel(a.status)}</Badge>
                       </div>
                     ))}
                   </div>
@@ -570,7 +584,7 @@ const Dashboard = () => {
                     <div className="space-y-2"><Label className="text-xs">{t("dash.firstName")}</Label><Input placeholder={t("dash.firstName")} /></div>
                     <div className="space-y-2"><Label className="text-xs">{t("dash.lastName")}</Label><Input placeholder={t("dash.lastName")} /></div>
                   </div>
-                  <div className="space-y-2"><Label className="text-xs">{t("dash.emailAddress")}</Label><Input type="email" placeholder="email@example.com" /></div>
+                  <div className="space-y-2"><Label className="text-xs">{t("dash.emailAddress")}</Label><Input type="email" placeholder={t("dash.emailPlaceholder")} /></div>
                   <div className="space-y-2"><Label className="text-xs">{t("dash.phoneNumber")}</Label><Input placeholder="+880 ..." /></div>
                   <Button className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full gap-1" onClick={() => toast({ title: t("dash.profileUpdated") })}><Save className="h-4 w-4" /> {t("dash.saveChanges")}</Button>
                 </div>
